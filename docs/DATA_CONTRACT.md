@@ -1,124 +1,70 @@
-# Data contract
+# Hydrodynamic data contract
 
-## Scientific boundary
+## Scientific source
 
-The published anisotropic Womersley solution is immutable hydrodynamic ground truth. This
-package does not refit, reconstruct from WSS, or replace the signed Lamb-force field.
+The published anisotropic Womersley source is a versioned Git artifact, not a presumed binary data
+archive. Its identity is fixed by the paper DOI, picoNewton repository commit, v2 notebook path and
+Git blob, frozen input-registry checksum, LambForce-EC reproduction commit, numerical configuration,
+and generated-record payload checksum.
 
-A converted artery record is **not claim-bearing** merely because it can be loaded. It becomes
-eligible only after all archive, member, conversion, payload, and hydrodynamic-regression checks
-pass against the version-controlled source registry.
+## Standardized arrays
 
-## Canonical NPZ arrays
+Each generated artery record contains:
 
-Every converted record contains:
+- `radial_coordinate_m`: strictly increasing near-wall physical radius, shape `(n_radial,)`;
+- `time_s`: uniformly sampled, endpoint-exclusive cardiac cycle, shape `(n_time,)`;
+- `lamb_density_signed_n_m3`: signed anisotropic radial Lamb-force density,
+  shape `(n_radial, n_time)`;
+- `lamb_density_isotropic_n_m3`: isotropic-control density with the same shape;
+- `wall_shear_stress_pa`: simultaneous tangential traction, shape `(n_time,)`;
+- `metadata_json`: canonical provenance and hydrodynamic-contract metadata.
 
-- `radial_coordinate_m`: `(n_radial,)`, strictly increasing;
-- `time_s`: `(n_time,)`, uniformly sampled and endpoint-exclusive;
-- `lamb_density_signed_n_m3`: `(n_radial, n_time)`;
-- `lamb_density_isotropic_n_m3`: `(n_radial, n_time)` for every claim-bearing record;
-- `wall_shear_stress_pa`: `(n_time,)`;
-- `metadata_json`: scalar canonical JSON string.
+The outward normal is positive. Signed density is integrated without an absolute value for mechanics.
+The absolute-value integral remains an exposure diagnostic only.
 
-The outward wall normal is positive. The signed field is integrated without an absolute value for
-mechanics. The absolute-value integral is retained only as an exposure diagnostic.
+## Published-source provenance
 
-## Four independent provenance checksums
+`metadata.published_source` records:
 
-The metadata separates four non-interchangeable checksums:
+- source repository and exact commit;
+- v2 notebook path and Git blob SHA;
+- frozen published-input registry SHA-256;
+- LambForce-EC reproduction commit;
+- reproduction-configuration SHA-256;
+- reproduction mode: `historical_v2` or `verified`.
 
-1. `source_archive_sha256` — checksum of the immutable original archive;
-2. `source_member_sha256` — checksum of the exact original artery member used for conversion;
-3. `conversion_manifest_sha256` — checksum of the artery conversion manifest;
-4. `record_payload_sha256` — checksum of the converted arrays and immutable record metadata.
+The current NPZ serializer retains the former checksum field names as compatibility aliases for files
+created by package versions 0.5.x and earlier. Their canonical meanings in version 0.6.0 are:
 
-It also records `converter_commit_sha`, the full Git commit that performed conversion.
+| Compatibility field | Canonical meaning |
+|---|---|
+| `source_archive_sha256` | canonical source-snapshot identity |
+| `source_member_sha256` | exact published-source identity digest |
+| `conversion_manifest_sha256` | reproduction-configuration digest |
+| `converter_commit_sha` | LambForce-EC reproduction commit |
 
-`load_artery_npz` recomputes `record_payload_sha256` and rejects altered arrays or immutable
-metadata. A copied archive checksum in metadata is therefore insufficient to establish integrity.
+These aliases are not evidence that an external archive or artery-member NPZ exists. New scientific
+logic uses `metadata.published_source` and the source registry.
 
-## Claim-bearing hydrodynamic contract
+## Payload integrity
 
-For the six registered arteries, `metadata.hydrodynamic_contract` is mandatory and contains:
+`record_payload_sha256` covers every hydrodynamic array and immutable metadata. It is recomputed on
+load. Copying source metadata onto changed arrays cannot authorize a record.
 
-- `rho_kg_m3`;
-- `nu_zz_m2_s`;
-- `reference_area_m2`;
-- `fluid_integration_depth_m`;
-- `womersley_alpha`;
-- `radial_collocation_order`;
-- `harmonic_rms_tolerance`;
-- `source_waveform_identifier`;
-- `source_archive_member`;
-- archived magnitude and phase arrays for:
-  - signed integrated Lamb load;
-  - isotropic integrated Lamb load;
-  - wall shear stress.
+## Hydrodynamic contract
 
-The radial grid must begin at `R - fluid_integration_depth_m`, end at `R`, and contain exactly the
-registered radial collocation order. Missing isotropic data are rejected for claim-bearing records;
-they are never replaced by a zero field.
+Every six-artery record must include:
 
-## Source registry gate
+- density, axial kinematic viscosity, fundamental frequency, reference area and integration depth;
+- Womersley number and radial order;
+- source notebook identity and reproduction mode;
+- generated harmonic magnitude and phase arrays for signed Lamb load, isotropic Lamb load, and WSS;
+- the exact radial interval from `R - delta_f` to `R`.
 
-A claim-bearing run must resolve uniquely to a source-registry record with:
+A missing isotropic field is an error for claim-bearing records and is never replaced by zero.
 
-- `claim_bearing: true`;
-- `role: immutable_hydrodynamic_ground_truth`;
-- `archive_status: verified`;
-- matching archive checksum;
-- matching artery-member checksum;
-- matching conversion-manifest checksum;
-- matching converter commit.
+## Qualification state
 
-Synthetic data are registered separately as `software_validation_only` and can never satisfy this
-gate.
-
-## Deterministic conversion
-
-Use:
-
-```text
-lambforce-ec ingest-archive \
-  --archive <immutable-archive> \
-  --member-npz <exact-artery-member.npz> \
-  --manifest <artery-conversion-manifest.yaml> \
-  --converter-commit <40-character-git-sha> \
-  --output <canonical-artery-record.npz>
-```
-
-The command does not mark a source verified. It emits candidate checksums for review and registry
-freeze.
-
-## Hydrodynamic qualification
-
-After the source registry is frozen as verified, run:
-
-```text
-lambforce-ec verify-hydrodynamics \
-  --input <canonical-artery-record.npz> \
-  --source-registry <frozen-source-registry.yaml> \
-  --output <qualification-report.json>
-```
-
-The qualification report verifies:
-
-- complete source binding;
-- converted-record payload integrity;
-- exact radial integration interval;
-- signed and isotropic fields;
-- WSS waveform;
-- harmonic reconstruction error against the archived tolerance;
-- explicit anisotropy increment;
-- exposure diagnostic;
-- `total = isotropic + anisotropy increment`.
-
-## Result bundle
-
-Each mechanics run directory contains:
-
-- `fields.npz`;
-- `manifest.json`.
-
-For claim-bearing CLI runs, the manifest records the converted-record checksum and the exact
-source-registry checksum in addition to solver, protocol, configuration, and output-file checksums.
+A generated record is initially non-claim-bearing. The source registry must remain
+`frozen_published_source` until the all-six historical and verified reproduction, cold-notebook
+regression, numerical qualification, and payload freeze are complete.

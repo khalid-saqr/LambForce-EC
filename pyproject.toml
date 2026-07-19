@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lambforce-ec"
-version = "0.5.0"
+version = "0.6.0"
 description = "Force-conserving endothelial mechanics interface for anisotropic near-wall Lamb forcing and WSS"
 readme = "docs/STEP3_ARCHITECTURE.md"
 requires-python = ">=3.10"
@@ -14,6 +14,7 @@ dependencies = [
   "numpy>=1.24",
   "scipy>=1.10",
   "PyYAML>=6.0",
+  "threadpoolctl>=3.1",
 ]
 
 [project.optional-dependencies]
@@ -33,6 +34,7 @@ where = ["src"]
 "share/lambforce_ec/registry" = [
   "registry/parameter_registry.csv",
   "registry/parameter_sets.yaml",
+  "registry/published_v2_hydrodynamics.yaml",
   "registry/source_registry.yaml",
   "registry/structural_classes.yaml",
 ]
@@ -45,7 +47,7 @@ where = ["src"]
 ]
 "share/lambforce_ec/schemas" = [
   "schemas/artery_input.schema.json",
-  "schemas/conversion_manifest.schema.json",
+  "schemas/published_hydrodynamics.schema.json",
   "schemas/run_config.schema.json",
   "schemas/source_registry.schema.json",
 ]

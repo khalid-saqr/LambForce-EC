@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Frozen picoNewton v2 hydrodynamic inputs",
+  "type": "object",
+  "required": [
+    "registry_version",
+    "source",
+    "fluid",
+    "control_volume",
+    "anisotropy",
+    "numerical",
+    "arteries"
+  ],
+  "properties": {
+    "registry_version": {"type": "string"},
+    "source": {
+      "type": "object",
+      "required": [
+        "repository",
+        "repository_commit_sha",
+        "published_notebook_path",
+        "published_notebook_blob_sha",
+        "paper_doi"
+      ],
+      "properties": {
+        "repository": {"const": "khalid-saqr/picoNewton"},
+        "repository_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "published_notebook_path": {"const": "picoNewton_v2.ipynb"},
+        "published_notebook_blob_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "paper_doi": {"const": "10.1038/s41598-026-47474-x"}
+      },
+      "additionalProperties": true
+    },
+    "fluid": {
+      "type": "object",
+      "required": ["density_kg_m3", "kinematic_viscosity_m2_s", "fundamental_frequency_hz"]
+    },
+    "control_volume": {
+      "type": "object",
+      "required": ["reference_area_m2", "reference_volume_m3"]
+    },
+    "anisotropy": {
+      "type": "object",
+      "required": [
+        "beta",
+        "gamma",
+        "delta",
+        "isotropic_beta",
+        "isotropic_gamma",
+        "isotropic_delta"
+      ]
+    },
+    "numerical": {
+      "type": "object",
+      "required": [
+        "radial_order",
+        "time_points",
+        "quadrature_nodes",
+        "harmonics_retained",
+        "harmonic_rms_tolerance"
+      ]
+    },
+    "arteries": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": [
+          "artery_id",
+          "artery_name",
+          "radius_m",
+          "published_womersley_alpha",
+          "pressure_gradient_scale_pa_per_m",
+          "harmonic_coefficients"
+        ],
+        "properties": {
+          "artery_id": {
+            "enum": [
+              "aortic_root",
+              "thoracic_aorta",
+              "femoral",
+              "carotid",
+              "iliac",
+              "brachial"
+            ]
+          },
+          "harmonic_coefficients": {
+            "type": "array",
+            "minItems": 6,
+            "maxItems": 6,
+            "items": {"type": "number"}
+          },
+          "published_womersley_alpha": {"type": "number", "exclusiveMinimum": 0}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

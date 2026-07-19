@@ -1,32 +1,30 @@
 # Phase 0 validation report
 
-## Corrected status
+## Status
 
-`SUPERSEDED_BY_PRE_PHASE1_READINESS_FIX`
+`SOFTWARE_AND_PROTOCOL_SURFACES_VALIDATED`
 
-The original Phase 0 report recorded local checks as passing, but PR #4's GitHub Actions run failed
-before pytest, Ruff, compilation, and wheel verification executed. The failure was caused by the
-invalid traceability status `implemed`.
+PR #5 restored CI credibility and passed the Python 3.10-3.12 matrix, including semantic registries,
+traceability, payload tamper detection, mechanics tests, Ruff, compilation, wheel construction, and
+installed-wheel validation.
 
-The local structural stress-test numbers remain non-claim-bearing development evidence. They are
-not treated as an independently reproduced repository gate.
+PR #6 corrects the scientific source model used by the next phase. The earlier archive-ingestion
+contract is superseded because the publication identifies a public Git notebook artifact rather than
+a separate six-member hydrodynamic archive.
 
-## Replacement gate
+## Active pre-scientific gate
 
-The pre-Phase 1 readiness PR replaces this report with a CI-enforced matrix across Python 3.10,
-3.11, and 3.12. The PR must remain unmerged until all jobs pass:
+The repository now validates:
 
-- semantic parameter and source registry validation;
-- README blob and traceability path validation;
-- converted-record tamper detection;
-- complete claim-bearing archive contract tests;
-- analytical manufactured-solution checks for bounded support classes;
-- the full existing test suite;
-- Ruff and bytecode compilation;
-- wheel build;
-- installed-wheel registry audit outside the checkout.
+- the exact paper DOI, picoNewton commit, v2 notebook path and Git blob;
+- the frozen six-artery scalar and harmonic input registry;
+- explicit `historical_v2` and `verified` reproduction modes;
+- repeated deterministic generation of twelve standardized records in the software profile;
+- payload tamper detection and fail-closed claim-bearing mechanics;
+- the complete existing mechanics and governance test suite.
 
 ## Scientific status
 
-No immutable six-artery archive has been attached. No claim-bearing mechanics result has been
-generated.
+The hydrodynamic reproduction has not yet been promoted to claim-bearing status. A cold execution of
+the exact v2 notebook, all-six publication-resolution regression, numerical convergence, discrepancy
+review, and payload freeze remain required. No claim-bearing endothelial result has been generated.

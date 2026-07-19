@@ -18,15 +18,14 @@ def test_synthetic_record_cannot_be_promoted_to_claim_bearing():
                 "source_identifier": record.source_identifier,
                 "source_version": record.source_version,
                 "artery_ids": [record.artery_id],
-                "archive_status": "verified",
-                "archive_sha256": record.source_archive_sha256,
-                "source_member_sha256_by_artery": {
-                    record.artery_id: record.source_member_sha256
-                },
-                "conversion_manifest_sha256_by_artery": {
-                    record.artery_id: record.conversion_manifest_sha256
-                },
-                "converter_commit_sha": record.converter_commit_sha,
+                "source_status": "synthetic_non_claim_bearing",
+                "repository_commit_sha": None,
+                "published_notebook_path": None,
+                "published_notebook_blob_sha": None,
+                "published_input_registry_sha256": None,
+                "reproduction_commit_sha": None,
+                "record_payload_sha256_by_mode_and_artery": {},
+                "qualification_status": "not_applicable",
                 "role": "software_validation_only",
                 "claim_bearing": False,
             }
