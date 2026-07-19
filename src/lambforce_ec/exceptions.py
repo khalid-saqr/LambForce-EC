@@ -1,10 +1,14 @@
 class LambForceECError(Exception):
-    """Base package exception."""
+    """Base package error."""
 
 
-class ValidationError(LambForceECError, ValueError):
-    """Raised when a scientific input record violates the data contract."""
+class ValidationError(LambForceECError):
+    """Raised when a frozen contract or input validation rule is violated."""
 
 
-class ConservationError(LambForceECError, RuntimeError):
-    """Raised when a load or reaction resultant fails the registered tolerance."""
+class ConservationError(LambForceECError):
+    """Raised when applied and reaction resultants do not agree."""
+
+
+class ProvenanceError(LambForceECError):
+    """Raised when a claim-bearing source cannot be resolved to a verified archive."""

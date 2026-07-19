@@ -5,6 +5,7 @@ from scipy.integrate import trapezoid
 
 from .exceptions import ValidationError
 from .models import ArteryRecord, Geometry, RunConfig
+from .structural import grid_coordinates
 from .validation import assert_conserved
 
 
@@ -33,6 +34,8 @@ def extract_scalar_loads(record: ArteryRecord) -> dict[str, np.ndarray]:
         "lamb_isotropic_pa": isotropic,
         "lamb_anisotropy_increment_pa": total - isotropic,
         "lamb_exposure_pa": exposure,
+        "lamb_inward_pa": np.minimum(total, 0.0),
+        "lamb_outward_pa": np.maximum(total, 0.0),
         "wss_pa": np.asarray(record.wall_shear_stress_pa, dtype=float),
     }
 
@@ -41,7 +44,7 @@ def select_load_case(loads: dict[str, np.ndarray], load_case: str) -> tuple[np.n
     zero = np.zeros_like(loads["wss_pa"])
     if load_case == "unloaded":
         return zero, zero
-    if load_case == "wss_only":
+    if load_case in {"wss_only", "zero_normal_load"}:
         return zero, loads["wss_pa"]
     if load_case == "lamb_signed_only":
         return loads["lamb_signed_pa"], zero
@@ -53,14 +56,11 @@ def select_load_case(loads: dict[str, np.ndarray], load_case: str) -> tuple[np.n
         return loads["lamb_anisotropy_increment_pa"], loads["wss_pa"]
     if load_case == "exposure_diagnostic":
         return loads["lamb_exposure_pa"], zero
+    if load_case == "inward_only":
+        return loads["lamb_inward_pa"], loads["wss_pa"]
+    if load_case == "outward_only":
+        return loads["lamb_outward_pa"], loads["wss_pa"]
     raise ValidationError(f"Unknown load_case: {load_case}")
-
-
-def periodic_grid(geometry: Geometry, nx: int, nz: int) -> tuple[np.ndarray, np.ndarray, float, float]:
-    geometry.validate()
-    x = np.arange(nx) * geometry.length_x_m / nx
-    z = np.arange(nz) * geometry.length_z_m / nz
-    return x, z, geometry.length_x_m / nx, geometry.length_z_m / nz
 
 
 def spatial_kernel(
@@ -69,14 +69,21 @@ def spatial_kernel(
     glycocalyx_thickness_field_m: np.ndarray | None = None,
 ) -> np.ndarray:
     config.validate()
-    x, z, dx, dz = periodic_grid(geometry, config.nx, config.nz)
+    x, z, dx, dz = grid_coordinates(geometry, config)
     if config.load_distribution == "uniform_apical":
         kernel = np.ones((config.nx, config.nz), dtype=float)
     elif config.load_distribution == "localized_bound":
-        # Periodic minimum-image Gaussian; widths are preregistered geometry fractions.
         x0, z0 = 0.5 * geometry.length_x_m, 0.5 * geometry.length_z_m
-        dxp = np.minimum(np.abs(x[:, None] - x0), geometry.length_x_m - np.abs(x[:, None] - x0))
-        dzp = np.minimum(np.abs(z[None, :] - z0), geometry.length_z_m - np.abs(z[None, :] - z0))
+        if config.lateral_support == "periodic_monolayer":
+            dxp = np.minimum(
+                np.abs(x[:, None] - x0), geometry.length_x_m - np.abs(x[:, None] - x0)
+            )
+            dzp = np.minimum(
+                np.abs(z[None, :] - z0), geometry.length_z_m - np.abs(z[None, :] - z0)
+            )
+        else:
+            dxp = np.abs(x[:, None] - x0)
+            dzp = np.abs(z[None, :] - z0)
         sx = config.localized_sigma_x_fraction * geometry.length_x_m
         sz = config.localized_sigma_z_fraction * geometry.length_z_m
         kernel = np.exp(-0.5 * ((dxp / sx) ** 2 + (dzp / sz) ** 2))
@@ -88,7 +95,6 @@ def spatial_kernel(
         h = np.asarray(glycocalyx_thickness_field_m, dtype=float)
         if h.shape != (config.nx, config.nz) or not np.all(np.isfinite(h)) or np.any(h <= 0):
             raise ValidationError("glycocalyx thickness field has an invalid shape or value.")
-        # Common-displacement spring limit: local transmitted traction scales as E/h.
         kernel = 1.0 / h
     else:
         raise ValidationError(f"Unknown load_distribution: {config.load_distribution}")

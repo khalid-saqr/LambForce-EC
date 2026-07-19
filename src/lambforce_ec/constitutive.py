@@ -10,7 +10,7 @@ def sls_complex_modulus(material: SLSMaterial, omega_rad_s: float) -> complex:
     if omega_rad_s < 0 or not np.isfinite(omega_rad_s):
         raise ValueError("omega_rad_s must be finite and non-negative.")
     e0 = material.einf_pa * material.ratio_e0_einf
-    if omega_rad_s == 0:
+    if omega_rad_s == 0 or material.ratio_e0_einf == 1:
         return complex(material.einf_pa)
     z = 1j * omega_rad_s * material.relaxation_time_s
     return material.einf_pa + (e0 - material.einf_pa) * z / (1 + z)

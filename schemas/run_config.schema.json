@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LambForce-EC Phase 0 run configuration",
+  "type": "object",
+  "required": [
+    "solver_id", "load_distribution", "lateral_support", "membrane_cortex_coupling",
+    "nuclear_representation", "prestress_state", "rheology_mode", "load_case",
+    "harmonic_control", "protocol_version", "parameter_freeze_version", "claim_bearing"
+  ],
+  "properties": {
+    "solver_id": {"enum": ["periodic_spectral_2d", "bounded_fd_2d", "lumped_0d"]},
+    "load_distribution": {"enum": ["uniform_apical", "glycocalyx_resolved", "localized_bound"]},
+    "lateral_support": {"enum": ["periodic_monolayer", "compliant_edge", "clamped_edge"]},
+    "membrane_cortex_coupling": {"enum": ["perfectly_bonded", "tangential_slip_limit"]},
+    "nuclear_representation": {"enum": ["homogeneous_cell_body", "stiff_nuclear_region"]},
+    "prestress_state": {"const": "zero"},
+    "rheology_mode": {"enum": ["elastic", "sls"]},
+    "load_case": {
+      "enum": [
+        "unloaded", "wss_only", "lamb_signed_only", "wss_plus_lamb_signed",
+        "exposure_diagnostic", "isotropic_lamb", "anisotropy_increment",
+        "inward_only", "outward_only", "zero_normal_load"
+      ]
+    },
+    "harmonic_control": {"enum": ["fundamental_only", "harmonics_le_2", "full_waveform"]},
+    "protocol_version": {"const": "2.0.0"},
+    "parameter_freeze_version": {"const": "2.0.0"},
+    "claim_bearing": {"type": "boolean"}
+  },
+  "additionalProperties": true
+}

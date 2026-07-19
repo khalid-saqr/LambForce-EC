@@ -22,7 +22,6 @@ def make_synthetic_artery(
     y = (radius_m - radial) / depth
     envelope = np.exp(-4 * y)[:, None]
     phase = omega0 * time[None, :]
-    # Integral across depth is O(10^-2 Pa), within the Step 1 feasibility range.
     total = 5.0e3 * envelope * (
         np.sin(phase) + 0.35 * np.sin(2 * phase + 0.4) + 0.15 * np.sin(4 * phase - 0.2)
     )
@@ -32,6 +31,7 @@ def make_synthetic_artery(
         "generator": "lambforce_ec.synthetic.make_synthetic_artery",
         "purpose": "software verification only; not a physiological result",
         "frequency_hz": frequency_hz,
+        "archive_status": "synthetic_non_claim_bearing",
     }
     checksum = checksum_arrays(
         {
@@ -54,7 +54,7 @@ def make_synthetic_artery(
         wall_shear_stress_pa=wss,
         lamb_density_isotropic_n_m3=isotropic,
         source_identifier="synthetic://lambforce-ec/software-validation",
-        source_version="1.0.0",
+        source_version="2.0.0-phase0",
         source_checksum=checksum,
         metadata=metadata,
     )

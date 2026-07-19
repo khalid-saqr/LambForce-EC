@@ -1,7 +1,9 @@
 """LambForce-EC production mechanics package."""
 
 from .models import ArteryRecord, Geometry, MaterialState, RunConfig, SLSMaterial
-from .workflow import run_case, run_registered_comparison
+from .workflow import SimulationResult, required_run_matrix, run_case, run_registered_comparison
+
+__version__ = "0.4.0"
 
 __all__ = [
     "ArteryRecord",
@@ -9,8 +11,8 @@ __all__ = [
     "MaterialState",
     "RunConfig",
     "SLSMaterial",
+    "SimulationResult",
     "run_case",
     "run_registered_comparison",
+    "required_run_matrix",
 ]
-
-__version__ = "0.3.0"

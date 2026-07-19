@@ -1,0 +1,18 @@
+registry_version: 2.0.0-phase0
+sources:
+  - source_identifier: doi:10.1038/s41598-026-47474-x#immutable-hydrodynamic-archive
+    source_version: pending_archive_ingestion
+    artery_ids: [aortic_root, thoracic_aorta, femoral, carotid, iliac, brachial]
+    archive_status: awaiting_archive
+    archive_sha256: null
+    source_doi: 10.1038/s41598-026-47474-x
+    role: immutable_hydrodynamic_ground_truth
+    claim_bearing: true
+    note: Phase 1 must attach and verify the archived signed, isotropic, and WSS arrays.
+  - source_identifier: synthetic://lambforce-ec/software-validation
+    source_version: 2.0.0-phase0
+    artery_ids: [synthetic_validation_artery]
+    archive_status: synthetic_non_claim_bearing
+    archive_sha256: null
+    role: software_validation_only
+    claim_bearing: false
