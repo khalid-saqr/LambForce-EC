@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LambForce-EC parameter registry row",
+  "type": "object",
+  "required": [
+    "parameter_id",
+    "description",
+    "si_unit",
+    "source_id",
+    "source_strength",
+    "independent_or_derived",
+    "primary_or_secondary",
+    "claim_bearing"
+  ],
+  "properties": {
+    "parameter_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "symbol": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "si_unit": {
+      "type": "string",
+      "minLength": 1
+    },
+    "frozen_value": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "frozen_lower": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "frozen_upper": {
+      "type": [
+        "string",
+        "number",
+        "null"
+      ]
+    },
+    "frozen_set": {
+      "type": [
+        "string",
+        "array",
+        "null"
+      ]
+    },
+    "source_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_strength": {
+      "type": "string"
+    },
+    "independent_or_derived": {
+      "enum": [
+        "independent",
+        "derived"
+      ]
+    },
+    "primary_or_secondary": {
+      "enum": [
+        "primary",
+        "secondary",
+        "feasibility"
+      ]
+    },
+    "claim_bearing": {
+      "type": [
+        "boolean",
+        "string"
+      ]
+    },
+    "transformation_rule": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

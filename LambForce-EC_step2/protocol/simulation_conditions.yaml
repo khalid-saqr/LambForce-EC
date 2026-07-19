@@ -1,0 +1,48 @@
+protocol_version: "1.0.0-step1"
+reference_arteries:
+  - aortic_root
+  - thoracic_aorta
+  - femoral
+  - carotid
+  - iliac
+  - brachial
+additional_arteries:
+  permitted: true
+  registration_method: "schema_validated_input_record"
+endothelial_parameters:
+  primary_rule: "Use the same endothelial parameter set for every artery."
+loads:
+  - unloaded
+  - wss_only
+  - lamb_signed_only
+  - wss_plus_lamb_signed
+  - exposure_diagnostic
+  - isotropic_lamb
+  - anisotropy_increment
+harmonic_controls:
+  - fundamental_only
+  - harmonics_le_2
+  - full_waveform
+directional_controls:
+  - inward_only
+  - outward_only
+  - zero_normal_load
+structural_classes:
+  load_distribution:
+    - uniform_apical
+    - glycocalyx_resolved
+    - localized_bound
+  lateral_support:
+    - periodic_monolayer
+    - compliant_edge
+    - clamped_edge
+  membrane_cortex_coupling:
+    - perfectly_bonded
+    - tangential_slip_limit
+  nuclear_representation:
+    - homogeneous_cell_body
+    - stiff_nuclear_region
+numerical_resolution:
+  rule: "Selected by convergence for each approved solver."
+  inherited_fixed_time_points: false
+  inherited_fixed_quadrature_points: false

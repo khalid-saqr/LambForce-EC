@@ -1,0 +1,16 @@
+{
+  "analytical_baseline": "lumped_0d",
+  "benchmark_rows": 24,
+  "convergence_rows": 16,
+  "generated_files": [
+    "benchmarks/benchmark_results.csv",
+    "benchmarks/convergence_results.csv",
+    "benchmarks/solver_selection.json",
+    "benchmarks/benchmark_details.json"
+  ],
+  "primary_solver": "periodic_spectral_2d",
+  "prototype_claims_enabled": false,
+  "status": "PASS",
+  "step": 2,
+  "verification_solver": "bounded_fd_2d"
+}

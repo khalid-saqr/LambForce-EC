@@ -1,0 +1,64 @@
+step: 2
+role: numerical_method_selection
+reference_frequency_hz: 1.2
+geometry:
+  length_x_m: 3.60e-5
+  length_z_m: 3.21e-5
+  cell_height_m: 5.0e-6
+  cortex_thickness_m: 1.0e-7
+material_reference:
+  cortex_einf_pa: 1000.0
+  cortex_ratio_e0_einf: 2.0
+  cortex_tau_s: 0.05
+  cytosol_einf_pa: 500.0
+  cytosol_ratio_e0_einf: 2.0
+  cytosol_tau_s: 2.0
+  poisson_ratio: 0.45
+cases:
+  - id: zero_static
+    q_mean_pa: 0.0
+    q_amplitude_pa: 0.0
+    tau_w_pa: 0.0
+    frequency_hz: 0.0
+  - id: uniform_normal_low
+    q_mean_pa: 1.0e-3
+    q_amplitude_pa: 0.0
+    tau_w_pa: 0.0
+    frequency_hz: 0.0
+  - id: uniform_normal_high
+    q_mean_pa: 7.0e-2
+    q_amplitude_pa: 0.0
+    tau_w_pa: 0.0
+    frequency_hz: 0.0
+  - id: spatial_normal_static
+    q_mean_pa: 3.5e-2
+    q_amplitude_pa: 1.75e-2
+    tau_w_pa: 0.0
+    frequency_hz: 0.0
+  - id: tangential_static
+    q_mean_pa: 0.0
+    q_amplitude_pa: 0.0
+    tau_w_pa: 2.0
+    frequency_hz: 0.0
+  - id: harmonic_normal
+    q_mean_pa: 0.0
+    q_amplitude_pa: 7.0e-2
+    tau_w_pa: 0.0
+    frequency_hz: 1.2
+  - id: harmonic_tangential
+    q_mean_pa: 0.0
+    q_amplitude_pa: 0.0
+    tau_w_pa: 2.0
+    frequency_hz: 1.2
+  - id: harmonic_combined
+    q_mean_pa: 0.0
+    q_amplitude_pa: 7.0e-2
+    tau_w_pa: 2.0
+    frequency_hz: 1.2
+selection_gates:
+  residual_relative_l2_max: 1.0e-10
+  resultant_relative_error_max: 1.0e-10
+  spectral_analytic_error_max: 1.0e-10
+  primary_runtime_s_max_per_case: 1.0
+  primary_requires_spatial_fields: true
+  primary_requires_complex_harmonic_support: true
