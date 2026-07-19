@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 
 from .models import ArteryRecord
-from .validation import checksum_arrays
+from .validation import canonical_json_bytes, checksum_arrays, sha256_bytes
 
 
 def make_synthetic_artery(
@@ -33,16 +33,16 @@ def make_synthetic_artery(
         "frequency_hz": frequency_hz,
         "archive_status": "synthetic_non_claim_bearing",
     }
-    checksum = checksum_arrays(
-        {
-            "radial_coordinate_m": radial,
-            "time_s": time,
-            "lamb_density_signed_n_m3": total,
-            "wall_shear_stress_pa": wss,
-            "lamb_density_isotropic_n_m3": isotropic,
-        },
-        metadata,
-    )
+    arrays = {
+        "radial_coordinate_m": radial,
+        "time_s": time,
+        "lamb_density_signed_n_m3": total,
+        "wall_shear_stress_pa": wss,
+        "lamb_density_isotropic_n_m3": isotropic,
+    }
+    archive_checksum = checksum_arrays(arrays, {**metadata, "kind": "synthetic_archive"})
+    member_checksum = checksum_arrays(arrays, {**metadata, "kind": "synthetic_member"})
+    manifest_checksum = sha256_bytes(canonical_json_bytes({**metadata, "kind": "manifest"}))
     record = ArteryRecord(
         artery_id=artery_id,
         artery_name="Synthetic validation artery",
@@ -54,8 +54,11 @@ def make_synthetic_artery(
         wall_shear_stress_pa=wss,
         lamb_density_isotropic_n_m3=isotropic,
         source_identifier="synthetic://lambforce-ec/software-validation",
-        source_version="2.0.0-phase0",
-        source_checksum=checksum,
+        source_version="2.1.0-readiness",
+        source_checksum=archive_checksum,
+        source_member_sha256=member_checksum,
+        conversion_manifest_sha256=manifest_checksum,
+        converter_commit_sha="0" * 40,
         metadata=metadata,
     )
     record.validate()

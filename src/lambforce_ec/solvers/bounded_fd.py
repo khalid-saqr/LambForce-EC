@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+
 import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import spsolve
@@ -41,16 +42,23 @@ class BoundedFDSolution:
 
 class BoundedFDPlateSolver:
     solver_id = "bounded_fd_2d"
-    solver_version = "2.0.0-phase0"
+    solver_version = "2.1.0-readiness"
 
     @staticmethod
     def _d2(n: int, h: float) -> sparse.csr_matrix:
         return sparse.diags(
-            [np.ones(n - 1), -2 * np.ones(n), np.ones(n - 1)], [-1, 0, 1], format="csr"
+            [np.ones(n - 1), -2 * np.ones(n), np.ones(n - 1)],
+            [-1, 0, 1],
+            format="csr",
         ) / h**2
 
     @staticmethod
     def _d4(n: int, h: float, boundary_condition: str) -> sparse.csr_matrix:
+        """Fourth derivative with ghost-node elimination.
+
+        `compliant_edge` is the simply-supported bound: w=0 and w''=0.
+        `clamped_edge` is the clamped bound: w=0 and w'=0.
+        """
         matrix = sparse.diags(
             [
                 np.ones(n - 2),
@@ -66,19 +74,39 @@ class BoundedFDPlateSolver:
             matrix[0, 0] = 5.0
             matrix[-1, -1] = 5.0
         elif boundary_condition == "clamped_edge":
-            matrix[0, 0] = 7.0
-            matrix[-1, -1] = 7.0
+            # Quartic ghost-node elimination using w=0 and w'=0 at each edge.
+            # The first ghost value is 6*w1 - 2*w2 + w3/3, which yields a
+            # fourth-derivative boundary row exact for clamped quartic fields.
+            matrix[0, 0] = 12.0
+            matrix[0, 1] = -6.0
+            matrix[0, 2] = 4.0 / 3.0
+            matrix[-1, -1] = 12.0
+            matrix[-1, -2] = -6.0
+            matrix[-1, -3] = 4.0 / 3.0
         else:
             raise ValueError(f"Unsupported bounded boundary condition: {boundary_condition}")
         return matrix.tocsr() / h**4
 
     @staticmethod
-    def _curvatures(w: np.ndarray, dx: float, dz: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def _curvatures(
+        w: np.ndarray, dx: float, dz: float
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         padded = np.pad(w, ((1, 1), (1, 1)), mode="constant")
-        wxx = (padded[2:, 1:-1] - 2 * padded[1:-1, 1:-1] + padded[:-2, 1:-1]) / dx**2
-        wzz = (padded[1:-1, 2:] - 2 * padded[1:-1, 1:-1] + padded[1:-1, :-2]) / dz**2
+        wxx = (
+            padded[2:, 1:-1]
+            - 2 * padded[1:-1, 1:-1]
+            + padded[:-2, 1:-1]
+        ) / dx**2
+        wzz = (
+            padded[1:-1, 2:]
+            - 2 * padded[1:-1, 1:-1]
+            + padded[1:-1, :-2]
+        ) / dz**2
         wxz = (
-            padded[2:, 2:] - padded[2:, :-2] - padded[:-2, 2:] + padded[:-2, :-2]
+            padded[2:, 2:]
+            - padded[2:, :-2]
+            - padded[:-2, 2:]
+            + padded[:-2, :-2]
         ) / (4 * dx * dz)
         return -wxx, -wzz, -2 * wxz
 
@@ -92,10 +120,11 @@ class BoundedFDPlateSolver:
         boundary_condition: str = "compliant_edge",
         numerical_tolerance_relative: float = 1e-10,
     ) -> BoundedFDSolution:
-        del numerical_tolerance_relative
         q = np.asarray(load_pa, dtype=complex)
         if q.ndim != 2 or min(q.shape) < 6:
             raise ValueError("load_pa must be a 2D interior-grid array with at least six points.")
+        if numerical_tolerance_relative <= 0:
+            raise ValueError("numerical_tolerance_relative must be positive.")
         geometry.validate()
         material.validate()
         nx, nz = q.shape
@@ -125,7 +154,10 @@ class BoundedFDPlateSolver:
             kmap = np.asarray(foundation_stiffness_map_n_m3, dtype=complex)
             if kmap.shape != q.shape or np.any(np.abs(kmap) < 1e-30):
                 raise ValueError("foundation_stiffness_map_n_m3 has an invalid shape or value.")
-        operator = (d * biharmonic + sparse.diags(kmap.reshape(-1, order="F"), format="csr")).tocsr()
+        operator = (
+            d * biharmonic
+            + sparse.diags(kmap.reshape(-1, order="F"), format="csr")
+        ).tocsr()
         qvec = q.reshape(nx * nz, order="F")
         wvec = spsolve(operator, qvec)
         bending_vec = d * (biharmonic @ wvec)
@@ -133,6 +165,11 @@ class BoundedFDPlateSolver:
         reaction = bending_vec + foundation_vec
         residual = reaction - qvec
         residual_norm = np.linalg.norm(residual) / max(np.linalg.norm(qvec), 1e-30)
+        if not np.isfinite(residual_norm) or residual_norm > numerical_tolerance_relative:
+            raise RuntimeError(
+                "Bounded finite-difference solve failed the configured residual tolerance: "
+                f"{residual_norm:.3e} > {numerical_tolerance_relative:.3e}."
+            )
         w = wvec.reshape((nx, nz), order="F")
         curvature_x, curvature_z, curvature_xz = self._curvatures(w, dx, dz)
         surface_z = geometry.cortex_thickness_m / 2
@@ -140,9 +177,22 @@ class BoundedFDPlateSolver:
         strain_z = surface_z * curvature_z
         shear_strain_xz = surface_z * curvature_xz
         plane_stress_factor = ec / (1 - nu**2)
-        tension_x = plane_stress_factor * (strain_x + nu * strain_z) * geometry.cortex_thickness_m
-        tension_z = plane_stress_factor * (strain_z + nu * strain_x) * geometry.cortex_thickness_m
-        tension_xz = ec / (2 * (1 + nu)) * shear_strain_xz * geometry.cortex_thickness_m
+        tension_x = (
+            plane_stress_factor
+            * (strain_x + nu * strain_z)
+            * geometry.cortex_thickness_m
+        )
+        tension_z = (
+            plane_stress_factor
+            * (strain_z + nu * strain_x)
+            * geometry.cortex_thickness_m
+        )
+        tension_xz = (
+            ec
+            / (2 * (1 + nu))
+            * shear_strain_xz
+            * geometry.cortex_thickness_m
+        )
         glycocalyx_strain = q / eg
         w_top = w + q / kg
         darea = dx * dz
@@ -152,10 +202,17 @@ class BoundedFDPlateSolver:
         dissipated = 0.0
         is_viscoelastic = any(
             component.ratio_e0_einf > 1
-            for component in (material.cortex, material.cytosol, material.glycocalyx, material.nucleus)
+            for component in (
+                material.cortex,
+                material.cytosol,
+                material.glycocalyx,
+                material.nucleus,
+            )
         )
         if omega_rad_s > 0 and is_viscoelastic:
-            dissipated = 0.5 * omega_rad_s * float(np.imag(np.vdot(w_top, q) * darea))
+            dissipated = 0.5 * omega_rad_s * float(
+                np.imag(np.vdot(w_top, q) * darea)
+            )
         return BoundedFDSolution(
             x_m=x,
             z_m=z,

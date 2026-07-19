@@ -1,29 +1,25 @@
 {
   "claim_bearing": false,
-  "compileall": "PASS",
-  "package_version": "0.4.0",
-  "parameter_registry_rows": 28,
+  "historical_pr4_ci": {
+    "cause": "invalid traceability status implemed",
+    "conclusion": "failure",
+    "failed_step": "lambforce-ec phase0-check",
+    "pytest_executed": false,
+    "ruff_executed": false,
+    "wheel_build_executed": false
+  },
+  "package_version": "0.5.0",
+  "parameter_registry_rows": 36,
   "phase": 0,
-  "phase0_cli_check": "PASS",
-  "remaining_blocker": "immutable six-artery hydrodynamic archive ingestion and checksum verification",
-  "ruff": "PASS",
-  "status": "PASS_IMPLEMENTATION_READY",
-  "structural_stress_test": {
-    "max_conservation_error": 5.2615114269635526e-14,
-    "max_residual": 1.6876430362088442e-13,
-    "min_energy_density_j_m3": 1.5895997895549362e-17,
-    "runtime_s": 0.46343918000002304,
-    "status": "PASS",
-    "structural_states": 36
+  "remaining_scientific_blocker": "immutable six-artery archive ingestion and qualification",
+  "replacement_gate": {
+    "branch": "agent/pre-phase1-readiness-fixes",
+    "required_python_versions": [
+      "3.10",
+      "3.11",
+      "3.12"
+    ],
+    "status": "PENDING_GITHUB_CI"
   },
-  "tests": {
-    "failed": 0,
-    "passed": 37
-  },
-  "traceability": {
-    "blocked_on_archive": 2,
-    "implemented": 32,
-    "requirements": 34
-  },
-  "wheel_build": "PASS"
+  "status": "SUPERSEDED_BY_PRE_PHASE1_READINESS_FIX"
 }
