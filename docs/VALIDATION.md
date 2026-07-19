@@ -1,18 +1,27 @@
-# Step 3 validation matrix
+# Validation matrix
 
-| Requirement | Test |
+| Requirement | Verification |
 |---|---|
-| Signed radial integration | constant-field analytical integral |
-| Exposure remains non-directional | absolute-field analytical integral |
-| Spatial resultant conservation | uniform, localized and glycocalyx-resolved kernels |
-| Spectral analytical limit | uniform foundation response and single cosine mode |
-| Harmonic reconstruction | FFT round trip and harmonic truncation |
-| Complex viscoelastic support | passive SLS harmonic response |
-| Solver residual | spectral and bounded finite-difference residual tests |
-| Arbitrary artery support | non-reference artery ID accepted by the same schema |
+| Signed radial integration | analytical constant and sign-changing fields |
+| Exposure remains diagnostic | absolute-field control with no WSS |
+| Spatial resultant conservation | uniform, localized, and glycocalyx-resolved kernels |
+| Periodic spectral limit | uniform foundation response and single Fourier mode |
+| Bounded support classes | manufactured simply-supported and clamped biharmonic fields |
+| Harmonic reconstruction | FFT round trip, truncation controls, and archived waveform regression |
+| Elastic and viscoelastic behavior | passive SLS limits and zero elastic dissipation |
+| Solver residual | configured residual tolerance enforced by both spatial solvers |
+| Converted-record integrity | payload checksum recomputed during every load |
+| Immutable source binding | archive, member, manifest, converter, and source-registry checks |
+| Claim-bearing completeness | isotropic field, hydrodynamic parameters, radial interval, and harmonics required |
 | WSS-present comparison | combined and WSS-only runs share all non-load inputs |
-| Anisotropy attribution | total, isotropic and total-minus-isotropic controls generated |
-| Provenance | source and configuration checksums written to manifest |
-| Colab execution | notebook installs package, mounts Drive and creates timestamped runtime directory |
+| Anisotropy attribution | total, isotropic, and direct anisotropy-increment controls |
+| Governance | semantic registries, exact traceability IDs, README blob, code paths, and test symbols |
+| Installed package | wheel audit resolves canonical registries and protocols outside the checkout |
+| Colab execution | package install, Drive mount, and timestamped runtime directory |
 
-The tests validate implementation behavior. They do not establish biological meaning or reproduce the six published fields without the immutable source arrays.
+## Stage boundary
+
+The software tests validate implementation and qualification behavior. They do not establish
+biological meaning. Phase 1 must ingest the immutable six-artery archive and reproduce each
+published signed integral, isotropic limit, WSS waveform, and harmonic signature before mechanics
+runs become claim-bearing.

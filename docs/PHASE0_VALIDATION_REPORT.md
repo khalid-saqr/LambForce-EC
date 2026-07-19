@@ -1,40 +1,32 @@
 # Phase 0 validation report
 
-## Verdict
+## Corrected status
 
-`PASS_IMPLEMENTATION_READY`
+`SUPERSEDED_BY_PRE_PHASE1_READINESS_FIX`
 
-The README-to-implementation traceability matrix and all previously missing protocol surfaces are implemented. Claim-bearing execution remains intentionally blocked until the immutable six-artery hydrodynamic archive is attached and its checksums are verified.
+The original Phase 0 report recorded local checks as passing, but PR #4's GitHub Actions run failed
+before pytest, Ruff, compilation, and wheel verification executed. The failure was caused by the
+invalid traceability status `implemed`.
 
-## Checks
+The local structural stress-test numbers remain non-claim-bearing development evidence. They are
+not treated as an independently reproduced repository gate.
 
-- 37 tests passed.
-- Ruff passed.
-- Python bytecode compilation passed.
-- Wheel construction passed for package version `0.4.0`.
-- `lambforce-ec phase0-check` passed.
-- The parameter registry contains 28 records with the full README-required schema.
-- The traceability matrix contains 34 requirements: 32 implementation-closed and 2 blocked on immutable-archive ingestion.
+## Replacement gate
 
-## Structural stress test
+The pre-Phase 1 readiness PR replaces this report with a CI-enforced matrix across Python 3.10,
+3.11, and 3.12. The PR must remain unmerged until all jobs pass:
 
-The full frozen structural Cartesian product was executed using a non-claim-bearing synthetic record:
+- semantic parameter and source registry validation;
+- README blob and traceability path validation;
+- converted-record tamper detection;
+- complete claim-bearing archive contract tests;
+- analytical manufactured-solution checks for bounded support classes;
+- the full existing test suite;
+- Ruff and bytecode compilation;
+- wheel build;
+- installed-wheel registry audit outside the checkout.
 
-- 3 load distributions;
-- 3 lateral-support classes;
-- 2 membrane–cortex coupling limits;
-- 2 nuclear representations;
-- 36 total structural states.
+## Scientific status
 
-Observed bounds:
-
-- maximum residual: `1.6876430362088442e-13`;
-- maximum resultant-conservation error: `5.2615114269635526e-14`;
-- minimum strain-energy density: `1.5895997895549362e-17 J m^-3`;
-- total local runtime: `0.4634 s` at the small software-verification resolution.
-
-These values validate software and mathematical closure only. They are not endothelial or six-artery scientific results.
-
-## Fail-closed scientific boundary
-
-A run marked `claim_bearing: true` now requires a unique verified source-registry match for source identifier, source version, artery ID, and archive SHA-256. The six reference entries remain `awaiting_archive`, so Phase 1 cannot be bypassed with synthetic or reconstructed fields.
+No immutable six-artery archive has been attached. No claim-bearing mechanics result has been
+generated.

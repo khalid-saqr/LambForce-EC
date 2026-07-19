@@ -2,14 +2,31 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
 import numpy as np
 import yaml
 
+from .exceptions import ProvenanceError, ValidationError
 from .models import ArteryRecord, Geometry, MaterialState, RunConfig, SLSMaterial
+from .provenance import (
+    compute_record_payload_sha256,
+    record_payload_arrays,
+    record_payload_metadata,
+    verify_record_payload,
+)
 from .structural import validate_correlated_glycocalyx
-from .validation import checksum_arrays, require_keys, sha256_file
-from .workflow import SimulationResult
+from .validation import require_keys, sha256_file
+if TYPE_CHECKING:
+    from .workflow import SimulationResult
+
+
+_ARRAY_KEYS = (
+    "radial_coordinate_m",
+    "time_s",
+    "lamb_density_signed_n_m3",
+    "wall_shear_stress_pa",
+)
 
 
 def load_mapping(path: str | Path) -> dict[str, Any]:
@@ -25,14 +42,8 @@ def load_artery_npz(path: str | Path) -> ArteryRecord:
     path = Path(path)
     with np.load(path, allow_pickle=False) as data:
         require_keys(
-            set(data.files) and {name: None for name in data.files},
-            {
-                "radial_coordinate_m",
-                "time_s",
-                "lamb_density_signed_n_m3",
-                "wall_shear_stress_pa",
-                "metadata_json",
-            },
+            {name: None for name in data.files},
+            {*_ARRAY_KEYS, "metadata_json"},
             "artery NPZ",
         )
         metadata = json.loads(str(data["metadata_json"].item()))
@@ -45,11 +56,28 @@ def load_artery_npz(path: str | Path) -> ArteryRecord:
                 "omega0_rad_s",
                 "source_identifier",
                 "source_version",
-                "source_checksum",
+                "source_archive_sha256",
+                "source_member_sha256",
+                "conversion_manifest_sha256",
+                "converter_commit_sha",
+                "record_payload_sha256",
                 "coordinate_convention",
             },
             "artery metadata",
         )
+        legacy_checksum = metadata.get("source_checksum")
+        archive_checksum = metadata["source_archive_sha256"]
+        if legacy_checksum is not None and legacy_checksum != archive_checksum:
+            raise ProvenanceError("source_checksum and source_archive_sha256 disagree.")
+        for key in (
+            "source_archive_sha256",
+            "source_member_sha256",
+            "conversion_manifest_sha256",
+            "record_payload_sha256",
+            "converter_commit_sha",
+        ):
+            if not isinstance(metadata[key], str):
+                raise ProvenanceError(f"{key} must be populated in every canonical artery record.")
         iso = data["lamb_density_isotropic_n_m3"] if "lamb_density_isotropic_n_m3" in data else None
         record = ArteryRecord(
             artery_id=metadata["artery_id"],
@@ -63,11 +91,16 @@ def load_artery_npz(path: str | Path) -> ArteryRecord:
             lamb_density_isotropic_n_m3=iso,
             source_identifier=metadata["source_identifier"],
             source_version=metadata["source_version"],
-            source_checksum=metadata["source_checksum"],
+            source_checksum=archive_checksum,
             coordinate_convention=metadata["coordinate_convention"],
+            source_member_sha256=metadata["source_member_sha256"],
+            conversion_manifest_sha256=metadata["conversion_manifest_sha256"],
+            converter_commit_sha=metadata["converter_commit_sha"],
+            record_payload_sha256=metadata["record_payload_sha256"],
             metadata=metadata.get("metadata", {}),
         )
     record.validate()
+    verify_record_payload(record)
     return record
 
 
@@ -75,39 +108,58 @@ def save_artery_npz(record: ArteryRecord, path: str | Path) -> Path:
     record.validate()
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {
-        "radial_coordinate_m": np.asarray(record.radial_coordinate_m),
-        "time_s": np.asarray(record.time_s),
-        "lamb_density_signed_n_m3": np.asarray(record.lamb_density_signed_n_m3),
-        "wall_shear_stress_pa": np.asarray(record.wall_shear_stress_pa),
-    }
-    if record.lamb_density_isotropic_n_m3 is not None:
-        payload["lamb_density_isotropic_n_m3"] = np.asarray(record.lamb_density_isotropic_n_m3)
+    payload = record_payload_arrays(record)
+    payload_checksum = compute_record_payload_sha256(record)
     metadata = {
-        "artery_id": record.artery_id,
-        "artery_name": record.artery_name,
-        "radius_m": record.radius_m,
-        "omega0_rad_s": record.omega0_rad_s,
-        "source_identifier": record.source_identifier,
-        "source_version": record.source_version,
-        "source_checksum": record.source_checksum,
-        "coordinate_convention": record.coordinate_convention,
-        "record_payload_checksum": checksum_arrays(payload, record.metadata),
-        "metadata": record.metadata,
+        **record_payload_metadata(record),
+        "source_checksum": record.source_archive_sha256,
+        "record_payload_sha256": payload_checksum,
     }
-    np.savez_compressed(path, **payload, metadata_json=np.asarray(json.dumps(metadata, sort_keys=True)))
+    np.savez_compressed(
+        path,
+        **payload,
+        metadata_json=np.asarray(json.dumps(metadata, sort_keys=True, separators=(",", ":"))),
+    )
     return path
 
 
 def config_from_mapping(mapping: dict[str, Any]) -> tuple[Geometry, MaterialState, RunConfig]:
+    unknown_top = set(mapping) - {"geometry", "material", "run"}
+    if unknown_top:
+        raise ValidationError(f"Unknown configuration sections: {', '.join(sorted(unknown_top))}")
     g = mapping.get("geometry", {})
     m = mapping.get("material", {})
     r = mapping.get("run", {})
+    if not isinstance(g, dict) or not isinstance(m, dict) or not isinstance(r, dict):
+        raise ValidationError("geometry, material, and run configuration sections must be mappings.")
+    allowed_material = {
+        "cortex",
+        "cytosol",
+        "glycocalyx",
+        "nucleus",
+        "poisson_ratio",
+        "parameter_set_id",
+        "glycocalyx_state_id",
+    }
+    unknown_material = set(m) - allowed_material
+    if unknown_material:
+        raise ValidationError(
+            f"Unknown material parameters: {', '.join(sorted(unknown_material))}"
+        )
     geometry = Geometry(**g)
 
     def sls(name: str, default: SLSMaterial) -> SLSMaterial:
         value = m.get(name)
-        return default if value is None else SLSMaterial(**value)
+        if value is None:
+            return default
+        if not isinstance(value, dict):
+            raise ValidationError(f"material.{name} must be a mapping.")
+        unknown = set(value) - {"einf_pa", "ratio_e0_einf", "relaxation_time_s"}
+        if unknown:
+            raise ValidationError(
+                f"Unknown material.{name} parameters: {', '.join(sorted(unknown))}"
+            )
+        return SLSMaterial(**value)
 
     default_material = MaterialState()
     material = MaterialState(
@@ -127,7 +179,7 @@ def config_from_mapping(mapping: dict[str, Any]) -> tuple[Geometry, MaterialStat
     return geometry, material, config
 
 
-def save_result(result: SimulationResult, output_directory: str | Path) -> Path:
+def save_result(result: "SimulationResult", output_directory: str | Path) -> Path:
     output = Path(output_directory)
     output.mkdir(parents=True, exist_ok=True)
     npz_path = output / "fields.npz"

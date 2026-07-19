@@ -1,4 +1,4 @@
-matrix_version: 2.0.0-phase0
+matrix_version: 2.1.0-readiness
 requirements:
 - requirement_id: R01
   readme_section: '1'
@@ -10,189 +10,191 @@ requirements:
 - requirement_id: R02
   readme_section: '1'
   requirement: Scope ends at endothelial membrane mechanics
-  implementation: workflow.py output set; protocol/readme_traceability.yaml
+  implementation: src/lambforce_ec/workflow.py; protocol/readme_traceability.yaml
   tests: tests/test_phase0_traceability.py::test_traceability_matrix_is_complete
   outputs_or_gate: claim-bearing output manifest
   status: implemented
 - requirement_id: R03
   readme_section: '2'
   requirement: Primary comparison is WSS+Lamb minus WSS-only
-  implementation: workflow.run_registered_comparison
+  implementation: src/lambforce_ec/workflow.py
   tests: tests/test_workflow_phase0.py::test_registered_comparison_has_direct_increments
   outputs_or_gate: incremental Lamb field
   status: implemented
 - requirement_id: R04
   readme_section: '2'
   requirement: Do not retest WSS reconstruction of Lamb field
-  implementation: protocol/readme_traceability.yaml
+  implementation: README.md; protocol/readme_traceability.yaml
   tests: tests/test_phase0_traceability.py::test_traceability_matrix_is_complete
   outputs_or_gate: scientific boundary
   status: implemented
 - requirement_id: R05
   readme_section: '3'
   requirement: Signed radial density is integrated without absolute value
-  implementation: loads.extract_scalar_loads
+  implementation: src/lambforce_ec/loads.py
   tests: tests/test_load_controls.py::test_signed_and_exposure_integrals_are_distinct
   outputs_or_gate: signed load
   status: implemented
 - requirement_id: R06
   readme_section: '3'
   requirement: Exposure is diagnostic only
-  implementation: loads.select_load_case; metadata claim flags
+  implementation: src/lambforce_ec/loads.py; src/lambforce_ec/workflow.py
   tests: tests/test_load_controls.py::test_exposure_is_non_wss_diagnostic
   outputs_or_gate: exposure diagnostic
   status: implemented
 - requirement_id: R07
   readme_section: '3'
   requirement: WSS is simultaneous orthogonal tangential traction
-  implementation: workflow._solve_harmonics
+  implementation: src/lambforce_ec/workflow.py
   tests: tests/test_workflow_phase0.py::test_wss_present_and_slip_limit
   outputs_or_gate: WSS-present gate
   status: implemented
 - requirement_id: R08
   readme_section: '3'
   requirement: Every spatial load conserves the cell resultant
-  implementation: loads.spatial_kernel; validation.assert_conserved
+  implementation: src/lambforce_ec/loads.py; src/lambforce_ec/validation.py
   tests: tests/test_load_controls.py::test_all_load_distributions_conserve_resultant
   outputs_or_gate: resultant conservation gate
   status: implemented
 - requirement_id: R09
   readme_section: 4,14
   requirement: Machine-readable registry mirrors README schema
-  implementation: registry/parameter_registry.csv; protocol.validate_parameter_registry
-  tests: tests/test_phase0_traceability.py::test_parameter_registry_has_full_readme_schema
+  implementation: registry/parameter_registry.csv; src/lambforce_ec/protocol.py
+  tests: tests/test_readiness_governance.py::test_parameter_registry_semantics
   outputs_or_gate: parameter freeze
-  status: implemed
+  status: implemented
 - requirement_id: R10
   readme_section: 4,16
   requirement: No parameter changes after outcome inspection
-  implementation: RunConfig versions; configuration checksum
+  implementation: src/lambforce_ec/models.py; src/lambforce_ec/workflow.py
   tests: tests/test_protocol_surfaces.py::test_protocol_versions_are_locked
   outputs_or_gate: no-post-hoc gate
   status: implemented
 - requirement_id: R11
   readme_section: '5'
   requirement: Six artery hydrodynamic records resolve to immutable archive
-  implementation: registry/source_registry.yaml; protocol.assert_claim_bearing_source
-  tests: tests/test_provenance.py::test_claim_bearing_requires_verified_archive
+  implementation: registry/source_registry.yaml; src/lambforce_ec/archive.py; src/lambforce_ec/protocol.py
+  tests: tests/test_archive_integrity.py::test_claim_bearing_requires_full_archive_binding
   outputs_or_gate: source gate
   status: blocked_on_archive
 - requirement_id: R12
   readme_section: '5'
   requirement: Isotropic limit and anisotropy increment are explicit
-  implementation: loads.extract_scalar_loads; workflow.run_registered_comparison
+  implementation: src/lambforce_ec/loads.py; src/lambforce_ec/workflow.py
   tests: tests/test_workflow_phase0.py::test_registered_comparison_has_direct_increments
   outputs_or_gate: anisotropy attribution gate
   status: implemented
 - requirement_id: R13
   readme_section: '5'
   requirement: Time mesh and quadrature are selected by convergence
-  implementation: RunConfig numerical fields; Phase 1/2 gate
+  implementation: src/lambforce_ec/models.py; docs/VALIDATION.md
   tests: tests/test_protocol_surfaces.py::test_protocol_surface_registry
   outputs_or_gate: convergence report
   status: implemented
 - requirement_id: R14
   readme_section: '6'
   requirement: Frozen endothelial and nuclear geometry are explicit
-  implementation: models.Geometry; registry/parameter_registry.csv
+  implementation: src/lambforce_ec/models.py; registry/parameter_registry.csv
   tests: tests/test_protocol_surfaces.py::test_geometry_contains_frozen_nuclear_dimensions
   outputs_or_gate: geometry provenance
   status: implemented
 - requirement_id: R15
   readme_section: '7'
   requirement: Glycocalyx thickness and modulus remain correlated
-  implementation: models.GLYCOCALYX_STATES; structural.validate_correlated_glycocalyx
+  implementation: src/lambforce_ec/models.py; src/lambforce_ec/structural.py
   tests: tests/test_protocol_surfaces.py::test_glycocalyx_correlation_is_enforced
   outputs_or_gate: parameter robustness
   status: implemented
 - requirement_id: R16
   readme_section: '7'
   requirement: E G and K are not sampled independently
-  implementation: constitutive.py; registry derivation rules
+  implementation: src/lambforce_ec/constitutive.py; registry/parameter_registry.csv
   tests: tests/test_protocol_surfaces.py::test_parameter_registry_derivation_rules
   outputs_or_gate: material registry
   status: implemented
 - requirement_id: R17
   readme_section: '7'
   requirement: Elastic bounds precede viscoelastic extension
-  implementation: RunConfig.rheology_mode default elastic; MaterialState.for_rheology
+  implementation: src/lambforce_ec/models.py
   tests: tests/test_protocol_surfaces.py::test_elastic_mode_removes_relaxation_dependence
   outputs_or_gate: elastic primary gate
   status: implemented
 - requirement_id: R18
   readme_section: '8'
   requirement: All three load distributions are explicit
-  implementation: models.LOAD_DISTRIBUTIONS; loads.spatial_kernel
+  implementation: src/lambforce_ec/models.py; src/lambforce_ec/loads.py
   tests: tests/test_load_controls.py::test_all_load_distributions_conserve_resultant
   outputs_or_gate: structural robustness
   status: implemented
 - requirement_id: R19
   readme_section: '8'
   requirement: Periodic compliant and clamped supports are explicit
-  implementation: RunConfig.lateral_support; spectral.py; bounded_fd.py
-  tests: tests/test_structural_classes.py::test_all_lateral_supports_execute
+  implementation: src/lambforce_ec/models.py; src/lambforce_ec/solvers/spectral.py;
+    src/lambforce_ec/solvers/bounded_fd.py
+  tests: tests/test_bounded_boundary_verification.py::test_manufactured_support_solutions_converge
   outputs_or_gate: structural robustness
   status: implemented
 - requirement_id: R20
   readme_section: '8'
   requirement: Bonded and tangential-slip coupling limits are explicit
-  implementation: RunConfig.membrane_cortex_coupling; workflow.py
+  implementation: src/lambforce_ec/models.py; src/lambforce_ec/workflow.py
   tests: tests/test_workflow_phase0.py::test_wss_present_and_slip_limit
   outputs_or_gate: structural robustness
   status: implemented
 - requirement_id: R21
   readme_section: '8'
   requirement: Homogeneous and stiff nuclear representations are explicit
-  implementation: structural.foundation_stiffness_map
+  implementation: src/lambforce_ec/structural.py
   tests: tests/test_structural_classes.py::test_stiff_nuclear_region_changes_foundation_map
   outputs_or_gate: structural robustness
   status: implemented
 - requirement_id: R22
   readme_section: 8,9
   requirement: Zero prestress is enforced and unsupported prestress fails
-  implementation: RunConfig.validate
+  implementation: src/lambforce_ec/models.py
   tests: tests/test_protocol_surfaces.py::test_nonzero_prestress_is_rejected
   outputs_or_gate: prestress provenance
   status: implemented
 - requirement_id: R23
   readme_section: '9'
   requirement: Prohibited free parameters are absent or rejected
-  implementation: models.py; registry/structural_classes.yaml
+  implementation: src/lambforce_ec/models.py; registry/structural_classes.yaml
   tests: tests/test_protocol_surfaces.py::test_protocol_surface_registry
   outputs_or_gate: no-free-parameter gate
   status: implemented
 - requirement_id: R24
   readme_section: '10'
   requirement: All required load and sign controls are registered
-  implementation: models.LOAD_CASES; workflow.required_run_matrix
+  implementation: src/lambforce_ec/models.py; src/lambforce_ec/workflow.py
   tests: tests/test_load_controls.py::test_required_load_cases_are_complete
   outputs_or_gate: required simulation matrix
   status: implemented
 - requirement_id: R25
   readme_section: '10'
   requirement: Fundamental h<=2 and full waveform controls are registered
-  implementation: harmonics.apply_harmonic_control
-  tests: tests/test_protocol_surfaces.py::test_protocol_surface_registry
+  implementation: src/lambforce_ec/harmonics.py
+  tests: tests/test_harmonics.py::test_fft_round_trip_and_registered_controls
   outputs_or_gate: spectral relevance gate
   status: implemented
 - requirement_id: R26
   readme_section: '10'
   requirement: All structural classes use full Cartesian product
-  implementation: structural.structural_ensemble; registry/structural_classes.yaml
+  implementation: src/lambforce_ec/structural.py; registry/structural_classes.yaml
   tests: tests/test_structural_classes.py::test_structural_ensemble_is_full_product
   outputs_or_gate: structural robustness
   status: implemented
 - requirement_id: R27
   readme_section: '11'
   requirement: Claim-bearing fields and SI units are emitted
-  implementation: workflow.py; io.save_result
+  implementation: src/lambforce_ec/workflow.py; src/lambforce_ec/io.py
   tests: tests/test_workflow_phase0.py::test_required_output_fields_and_summaries
   outputs_or_gate: result manifest
   status: implemented
 - requirement_id: R28
   readme_section: '11'
-  requirement: Peak RMS mean percentile location concentration asymmetry harmonics and work are reported
-  implementation: analysis.field_summary; workflow metadata
+  requirement: Peak RMS mean percentile location concentration asymmetry harmonics
+    and work are reported
+  implementation: src/lambforce_ec/analysis.py; src/lambforce_ec/workflow.py
   tests: tests/test_workflow_phase0.py::test_required_output_fields_and_summaries
   outputs_or_gate: output summaries
   status: implemented
@@ -205,36 +207,38 @@ requirements:
   status: implemented
 - requirement_id: R30
   readme_section: '13'
-  requirement: Zero rigid energy dissipation convergence and deterministic checks precede science
-  implementation: tests; docs/PHASE0_PROTOCOL_SURFACE.md
-  tests: tests/test_solver_limits_phase0.py
+  requirement: Zero rigid energy dissipation convergence and deterministic checks
+    precede science
+  implementation: tests/test_solver_limits_phase0.py; docs/PHASE0_PROTOCOL_SURFACE.md
+  tests: tests/test_solver_limits_phase0.py::test_zero_load_and_positive_energy_limits
   outputs_or_gate: pre-scientific verification
   status: implemented
 - requirement_id: R31
   readme_section: '13'
   requirement: Source checksum must resolve to verified archive
-  implementation: protocol.assert_claim_bearing_source; registry/source_registry.yaml
-  tests: tests/test_provenance.py::test_claim_bearing_requires_verified_archive
+  implementation: src/lambforce_ec/provenance.py; src/lambforce_ec/protocol.py; registry/source_registry.yaml
+  tests: tests/test_archive_integrity.py::test_tampered_record_payload_is_rejected
   outputs_or_gate: source gate
   status: blocked_on_archive
 - requirement_id: R32
   readme_section: '13'
   requirement: total equals isotropic plus anisotropy increment at input level
-  implementation: loads.extract_scalar_loads
+  implementation: src/lambforce_ec/loads.py
   tests: tests/test_load_controls.py::test_total_equals_isotropic_plus_increment
   outputs_or_gate: anisotropy attribution gate
   status: implemented
 - requirement_id: R33
   readme_section: '14'
-  requirement: Registry includes source DOI URL cell type bed method strength and correlation
-  implementation: registry/parameter_registry.csv
-  tests: tests/test_phase0_traceability.py::test_parameter_registry_has_full_readme_schema
+  requirement: Registry includes source DOI URL cell type bed method strength and
+    correlation
+  implementation: registry/parameter_registry.csv; src/lambforce_ec/protocol.py
+  tests: tests/test_readiness_governance.py::test_parameter_registry_semantics
   outputs_or_gate: registry audit
   status: implemented
 - requirement_id: R34
   readme_section: '16'
   requirement: Silent changes require a new freeze version and impact analysis
-  implementation: RunConfig.validate; configuration checksum
+  implementation: src/lambforce_ec/models.py; src/lambforce_ec/workflow.py
   tests: tests/test_protocol_surfaces.py::test_protocol_versions_are_locked
   outputs_or_gate: change control
   status: implemented

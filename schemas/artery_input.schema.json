@@ -4,19 +4,135 @@
   "title": "LambForce-EC artery metadata",
   "type": "object",
   "required": [
-    "artery_id", "artery_name", "radius_m", "omega0_rad_s", "source_identifier",
-    "source_version", "source_checksum", "coordinate_convention"
+    "artery_id",
+    "artery_name",
+    "radius_m",
+    "omega0_rad_s",
+    "source_identifier",
+    "source_version",
+    "source_archive_sha256",
+    "source_member_sha256",
+    "conversion_manifest_sha256",
+    "converter_commit_sha",
+    "record_payload_sha256",
+    "coordinate_convention"
   ],
   "properties": {
-    "artery_id": {"type": "string", "minLength": 1},
-    "artery_name": {"type": "string", "minLength": 1},
-    "radius_m": {"type": "number", "exclusiveMinimum": 0},
-    "omega0_rad_s": {"type": "number", "exclusiveMinimum": 0},
-    "source_identifier": {"type": "string", "minLength": 1},
-    "source_version": {"type": "string", "minLength": 1},
-    "source_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
-    "coordinate_convention": {"const": "outward_normal_positive"},
-    "metadata": {"type": "object"}
+    "artery_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artery_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "radius_m": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "omega0_rad_s": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "source_identifier": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_archive_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "source_member_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "conversion_manifest_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "converter_commit_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "record_payload_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "coordinate_convention": {
+      "const": "outward_normal_positive"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "hydrodynamic_contract": {
+          "type": "object",
+          "required": [
+            "rho_kg_m3",
+            "nu_zz_m2_s",
+            "reference_area_m2",
+            "fluid_integration_depth_m",
+            "womersley_alpha",
+            "radial_collocation_order",
+            "harmonic_rms_tolerance",
+            "source_waveform_identifier",
+            "source_archive_member",
+            "archive_harmonics"
+          ],
+          "properties": {
+            "rho_kg_m3": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "nu_zz_m2_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "reference_area_m2": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "fluid_integration_depth_m": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "womersley_alpha": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "radial_collocation_order": {
+              "type": "integer",
+              "minimum": 2
+            },
+            "harmonic_rms_tolerance": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "source_waveform_identifier": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_archive_member": {
+              "type": "string",
+              "minLength": 1
+            },
+            "archive_harmonics": {
+              "type": "object",
+              "required": [
+                "signed_lamb_load",
+                "isotropic_lamb_load",
+                "wall_shear_stress"
+              ]
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
   },
   "additionalProperties": true
 }

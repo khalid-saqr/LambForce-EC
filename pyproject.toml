@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lambforce-ec"
-version = "0.4.0"
+version = "0.5.0"
 description = "Force-conserving endothelial mechanics interface for anisotropic near-wall Lamb forcing and WSS"
 readme = "docs/STEP3_ARCHITECTURE.md"
 requires-python = ">=3.10"
@@ -27,6 +27,28 @@ package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.data-files]
+"share/lambforce_ec" = ["README.md"]
+"share/lambforce_ec/registry" = [
+  "registry/parameter_registry.csv",
+  "registry/parameter_sets.yaml",
+  "registry/source_registry.yaml",
+  "registry/structural_classes.yaml",
+]
+"share/lambforce_ec/protocol" = [
+  "protocol/decision_gates.yaml",
+  "protocol/readme_traceability.yaml",
+]
+"share/lambforce_ec/configs" = [
+  "configs/reference_arteries.yaml",
+]
+"share/lambforce_ec/schemas" = [
+  "schemas/artery_input.schema.json",
+  "schemas/conversion_manifest.schema.json",
+  "schemas/run_config.schema.json",
+  "schemas/source_registry.schema.json",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

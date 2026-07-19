@@ -1,30 +1,23 @@
 # Step 3 validation report
 
-## Verdict
+## Historical scope
 
-`PASS_LOCAL` for production package implementation. This verdict concerns software architecture, dimensional closure, numerical behavior and provenance. It is not a biological or six-artery scientific result.
+`HISTORICAL_STEP3_LOCAL_VALIDATION`
 
-## Executed checks
+This report preserves the local validation evidence for Step 3 commit
+`65d4f7252b09b17d466ec13096335129f80465b6`. It does not describe the current package and must not
+be used as a current CI or Phase 1 readiness verdict.
 
-- 12 tests passed with 89% statement coverage.
-- Ruff static checks passed.
-- All source and test files compiled.
-- A distributable wheel was built.
-- The command-line workflow generated, validated and solved a synthetic field record and wrote a checksummed result manifest.
-- JSON, YAML and Colab notebook artifacts parsed successfully.
+At that commit, 12 local tests, Ruff, compilation, a wheel build, synthetic workflows, and reduced
+solver stress tests were reported as passing. Those checks were non-claim-bearing.
 
-## Stress test
+## Current gate
 
-Twenty-one periodic-spectral workflow runs covered seven artery identifiers, including one non-reference artery, and all three registered harmonic controls. Eight parameter-corner runs covered the frozen cortex, cytosol and Poisson-ratio bounds.
+The active package is governed by:
 
-The observed maxima were:
+- `docs/PRE_PHASE1_READINESS_FIXES.md`;
+- `docs/PHASE0_VALIDATION_REPORT.md`;
+- the current GitHub Actions Python 3.10–3.12 matrix;
+- the canonical registries and traceability matrix.
 
-- runtime: 0.0222 s per 16 x 16, 64-time-point workflow run;
-- spectral residual: 3.46e-16;
-- normal resultant conservation error: 4.77e-16.
-
-The minimum reduced elastic-energy density was positive at 1.80e-17 J m^-3.
-
-## Remaining scientific work
-
-The package is ready to receive the immutable signed Lamb-density, isotropic-control and WSS arrays for the six reference arteries. Those arrays are not reconstructed or fabricated in Step 3. Claim-bearing simulations, convergence at production resolution, parameter/structural robustness and the registered decision gates remain subsequent execution work.
+No six-artery archive has been qualified and no claim-bearing biological result has been generated.

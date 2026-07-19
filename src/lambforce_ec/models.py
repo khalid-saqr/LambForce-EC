@@ -3,11 +3,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field, replace
 from typing import Any
 import re
+
 import numpy as np
 
 from .exceptions import ValidationError
 
+
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_GIT_SHA = re.compile(r"^[0-9a-f]{40}$")
 
 GLYCOCALYX_STATES: dict[str, tuple[float, float]] = {
     "thin_stiff": (0.11e-6, 1000.0),
@@ -144,7 +147,16 @@ class ArteryRecord:
     source_version: str
     source_checksum: str
     coordinate_convention: str = "outward_normal_positive"
+    source_member_sha256: str | None = None
+    conversion_manifest_sha256: str | None = None
+    converter_commit_sha: str | None = None
+    record_payload_sha256: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def source_archive_sha256(self) -> str:
+        """Explicit alias retained for backward-compatible callers."""
+        return self.source_checksum
 
     def validate(self) -> None:
         if not self.artery_id.strip() or not self.artery_name.strip():
@@ -155,6 +167,15 @@ class ArteryRecord:
             raise ValidationError("omega0_rad_s must be finite and positive.")
         if not _SHA256.match(self.source_checksum):
             raise ValidationError("source_checksum must be a lowercase SHA-256 hexadecimal digest.")
+        for name, value in (
+            ("source_member_sha256", self.source_member_sha256),
+            ("conversion_manifest_sha256", self.conversion_manifest_sha256),
+            ("record_payload_sha256", self.record_payload_sha256),
+        ):
+            if value is not None and not _SHA256.match(value):
+                raise ValidationError(f"{name} must be a lowercase SHA-256 hexadecimal digest.")
+        if self.converter_commit_sha is not None and not _GIT_SHA.match(self.converter_commit_sha):
+            raise ValidationError("converter_commit_sha must be a full lowercase 40-character Git SHA.")
         if self.coordinate_convention != "outward_normal_positive":
             raise ValidationError("coordinate_convention must be outward_normal_positive.")
         r = np.asarray(self.radial_coordinate_m, dtype=float)
@@ -252,7 +273,7 @@ class RunConfig:
         if self.harmonic_control not in HARMONIC_CONTROLS:
             raise ValidationError(f"Unsupported harmonic_control: {self.harmonic_control}")
         if self.lateral_support == "periodic_monolayer" and self.solver_id == "bounded_fd_2d":
-            raise ValidationError("periodic_monolayer requires periodic_spectral_2d for claim-bearing runs.")
+            raise ValidationError("periodic_monolayer requires periodic_spectral_2d.")
         if self.lateral_support != "periodic_monolayer" and self.solver_id == "periodic_spectral_2d":
             raise ValidationError("bounded lateral supports require bounded_fd_2d.")
         if self.solver_id == "lumped_0d" and self.claim_bearing:
@@ -264,4 +285,4 @@ class RunConfig:
         if self.conservation_tolerance_relative <= 0 or self.numerical_tolerance_relative <= 0:
             raise ValidationError("numerical tolerances must be positive.")
         if self.protocol_version != "2.0.0" or self.parameter_freeze_version != "2.0.0":
-            raise ValidationError("Claim-bearing protocol and parameter freeze versions must be 2.0.0.")
+            raise ValidationError("Protocol and parameter freeze versions must be 2.0.0.")
