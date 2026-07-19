@@ -2,119 +2,42 @@
 
 # LambForce-EC
 
-## Multiscale endothelial membrane loading driven by the anisotropic near-wall Lamb-force field
+## Endothelial membrane loading from the anisotropic near-wall Lamb-force field
 
-**Frozen model thesis**
-
-> A multiscale physical interface reveals whether the integrated anisotropic near-wall inertial force field produces biologically meaningful endothelial membrane loading independently of wall shear stress across six arterial waveforms.
+> **Thesis:** A multiscale physical interface reveals whether the integrated anisotropic near-wall inertial force field produces biologically meaningful endothelial membrane loading independently of wall shear stress across six arterial waveforms.
 
 </div>
 
 ---
 
-## 1. Scope and ground truth
+## 1. Scientific scope
 
-This repository will implement a new computational continuation of:
+`LambForce-EC` is a standalone computational continuation of:
 
-**K. M. Saqr, “A transverse picoNewton force revealed in anisotropic Womersley flow,” Scientific Reports 16, 12584 (2026).**  
-DOI: [10.1038/s41598-026-47474-x](https://doi.org/10.1038/s41598-026-47474-x)
+**K. M. Saqr. _A transverse picoNewton force revealed in anisotropic Womersley flow._ Scientific Reports 16, 12584 (2026).**  
+[DOI 10.1038/s41598-026-47474-x](https://doi.org/10.1038/s41598-026-47474-x)
 
-The following are treated as **established hydrodynamic ground truth** and will not be retested as the new paper's central claim:
+The published paper is the hydrodynamic ground truth. It establishes that WSS is a tangential boundary traction, while the Lamb vector is a volumetric velocity–vorticity inertial field. In anisotropic Womersley flow, the near-wall Lamb field is signed, wall-normal, artery-dependent, and spectrally rich.
 
-- the near-wall Lamb vector is a volumetric inertial field, not wall shear stress;
-- the anisotropic Lamb-force waveform is fundamentally distinct from WSS;
-- the integrated endothelial-scale Lamb force is artery-dependent, signed, directional, and spectrally rich;
-- the six published arterial waveforms and their anisotropic Womersley solutions are immutable source inputs.
-
-The new model addresses only the missing mechanobiological bridge:
+This repository addresses only the missing mechanobiological bridge:
 
 ```text
-published anisotropic near-wall Lamb field
+published anisotropic Womersley fields
                  ↓
-signed endothelial-scale normal resultant
+signed Lamb-force density + WSS
                  ↓
-glycocalyx → apical membrane–cortex → cell body
+force-conserving apical loading
                  ↓
-spatial and temporal endothelial membrane-loading fields
+glycocalyx → membrane–cortex → cell body
+                 ↓
+endothelial membrane-loading fields
 ```
 
-Piezo1, calcium, gene expression, disease prediction, and post-hoc biological thresholds are outside the primary scope.
+The primary endpoint is endothelial mechanics. Downstream molecular signalling and disease prediction are outside the claim-bearing scope.
 
 ---
 
-## 2. Meaning of “frozen”
-
-The parameter freeze is versioned as:
-
-```text
-parameter_freeze_version: 1.0.0
-freeze_date: 2026-07-19
-```
-
-“Frozen” means:
-
-1. no parameter may be selected after seeing whether the Lamb-force hypothesis passes;
-2. every claim-bearing quantity has a unit, source, source-strength grade, and allowed value or range;
-3. dependent quantities are calculated from independent quantities rather than sampled separately;
-4. unsupported continuous tuning parameters are replaced by predeclared structural limits;
-5. any future change requires a new freeze version and documented scientific reason.
-
-This protocol does **not** claim zero biological uncertainty. It eliminates undocumented, unconstrained, and outcome-tuned parameter choices.
-
-### Source-strength grades
-
-| Grade | Definition | Permitted use |
-|---|---|---|
-| A | Direct endothelial measurement of the same parameter | Primary value or range |
-| B | Direct endothelial measurement from another vascular bed, phenotype, or preparation | Primary uncertainty range |
-| C | Value adopted in a published endothelial computational model | Reference value or secondary range |
-| D | Derived mathematical quantity or explicit structural assumption | Cannot independently determine the conclusion |
-
----
-
-## 3. Frozen physical interpretation
-
-### 3.1 Signed mechanical input
-
-The mechanical solver must use the signed wall-normal resultant:
-
-```math
-F_{L}^{\mathrm{signed}}(t)
-=
-A_{\mathrm{EC}}
-\int_{R-\delta_{\mathrm{EC}}}^{R}
-\rho\,\ell_r(r,t)\,dr.
-```
-
-The absolute-value quantity remains a non-directional exposure measure:
-
-```math
-F_{L}^{\mathrm{exposure}}(t)
-=
-A_{\mathrm{EC}}
-\int_{R-\delta_{\mathrm{EC}}}^{R}
-\left|\rho\,\ell_r(r,t)\right|\,dr.
-```
-
-`F_L_signed` is the claim-bearing load. `F_L_exposure` is descriptive only.
-
-### 3.2 No fitted transfer efficiency
-
-The model must not contain a free “Lamb-force transfer efficiency.” The applied normal load must conserve the published resultant:
-
-```math
-\int_{A_{\mathrm{EC}}} q_L(\mathbf{x},t)\,dA
-=
-F_{L}^{\mathrm{signed}}(t).
-```
-
-Any admissible spatial load-distribution model must satisfy this identity numerically.
-
-### 3.3 WSS and Lamb force are simultaneous, orthogonal inputs
-
-- WSS acts as tangential traction, `tau_w(t)` in Pa.
-- Lamb forcing acts as a signed wall-normal resultant, `F_L_signed(t)` in N.
-- The principal comparison is the incremental membrane response:
+## 2. Hypothesis and primary comparison
 
 ```math
 \Delta \mathbf{T}^{L}_{m}(\mathbf{x},t)
@@ -124,31 +47,89 @@ Any admissible spatial load-distribution model must satisfy this identity numeri
 \mathbf{T}^{\mathrm{WSS}}_{m}(\mathbf{x},t).
 ```
 
-The model does not attempt to reconstruct the Lamb field from WSS; that physical nonredundancy is already ground truth.
+- **Null:** the incremental Lamb-induced membrane field is not resolved above numerical and physiological uncertainty.
+- **Alternative:** it is resolved, anisotropy-attributable, experimentally plausible, and robust across the registered model domain.
+
+The project does not retest whether WSS can reconstruct the Lamb field; that distinction is already established by the ground-truth paper.
 
 ---
 
-## 4. Immutable hydrodynamic registry
+## 3. Hydrodynamic inputs
 
-All source arrays must be imported from an immutable release of the published `picoNewton` repository, with commit SHA and SHA-256 checksums recorded in every run manifest.
+```math
+\boldsymbol{\ell}=\mathbf{u}\times\boldsymbol{\omega},
+\qquad
+\boldsymbol{\omega}=\nabla\times\mathbf{u},
+```
 
-### 4.1 Endothelial-scale control volume
+```math
+\ell_r=u_\theta\omega_z-u_z\omega_\theta,
+\qquad
+f_r(r,t)=\rho\ell_r(r,t).
+```
 
-| ID | Symbol | Frozen value | SI unit | Status | Source |
-|---|---:|---:|---:|---|---|
-| `cell_footprint_area` | $`A_{\mathrm{EC}}`$ | $`100\times10^{-12}`$ | m² | Immutable | Published picoNewton baseline geometry |
-| `cell_control_volume` | $`V_{\mathrm{EC}}`$ | $`1.0\times10^{-15}`$ | m³ | Immutable | Published picoNewton baseline geometry |
-| `control_volume_depth` | $`\delta_{\mathrm{EC}}=V/A`$ | $`1.0\times10^{-5}`$ | m | Derived | Exact derivation from the two values above |
+The published non-directional exposure is
 
-Equivalent human-readable values:
+```math
+F_L^{\mathrm{exposure}}(t)
+=
+A_{\mathrm{ref}}
+\int_{R-\delta_f}^{R}|f_r(r,t)|\,dr.
+```
 
-- `A_EC = 100 µm²`
-- `V_EC = 1000 µm³`
-- `delta_EC = 10 µm`
+The claim-bearing signed input is reconstructed from the archived signed field:
 
-### 4.2 Six arterial inputs
+```math
+F_L^{\mathrm{signed}}(t)
+=
+A_{\mathrm{ref}}
+\int_{R-\delta_f}^{R}f_r(r,t)\,dr,
+```
 
-| Artery | Radius $`R`$ (m) | Womersley $`\alpha`$ | Six published signed harmonic amplitudes |
+```math
+q_L(t)
+=
+\frac{F_L^{\mathrm{signed}}(t)}{A_{\mathrm{ref}}}
+=
+\int_{R-\delta_f}^{R}f_r(r,t)\,dr
+\qquad [\mathrm{Pa}].
+```
+
+WSS is applied simultaneously as tangential traction, $`\boldsymbol{\tau}_w(t)`$. The area-normalized Lamb input is applied as wall-normal loading. No fitted transfer efficiency is permitted.
+
+Every spatial load model must conserve the resultant:
+
+```math
+\int_{A_{\mathrm{cell}}}q_L(\mathbf{x},t)\,dA
+=
+A_{\mathrm{cell}}q_L(t).
+```
+
+---
+
+## 4. Parameter freeze
+
+```text
+parameter_freeze_version: 2.0.0
+freeze_date: 2026-07-19
+```
+
+| Grade | Evidence | Use |
+|---|---|---|
+| A | Direct endothelial measurement of the same quantity | Primary value/range |
+| B | Direct endothelial measurement from another bed, species, or preparation | Sensitivity range |
+| C | Published endothelial mechanics model | Reference/secondary value |
+| D | Mathematical derivation or structural assumption | Bound or verification only |
+
+No parameter may be changed after inspecting the scientific outcome. Dependent quantities must be derived rather than sampled independently.
+
+---
+
+## 5. Frozen hydrodynamic registry
+
+### Six arterial waveforms
+
+| Artery | Radius `R` (m) | Womersley `alpha` | Six published signed harmonic amplitudes |
 |---|---:|---:|---|
 | Aortic root | 0.0150 | 22.03 | `[1.00, 0.82, 0.54, 0.33, 0.24, 0.17]` |
 | Thoracic aorta | 0.0120 | 17.62 | `[1.00, 0.76, 0.45, 0.28, 0.20, 0.12]` |
@@ -157,101 +138,82 @@ Equivalent human-readable values:
 | Iliac | 0.0045 | 6.61 | `[1.00, 0.51, 0.12, -0.11, 0.05, 0.03]` |
 | Brachial | 0.0020 | 2.94 | `[1.00, 0.49, 0.16, -0.05, 0.02, 0.01]` |
 
-### 4.3 Hydrodynamic quantities required from the source archive
+### Constitutive and numerical rules
 
-| ID | Symbol | Unit | Frozen rule |
-|---|---:|---:|---|
-| `lamb_density_signed` | $`f_r(r,t)=\rho\ell_r`$ | N m⁻³ | Full signed radial field |
-| `lamb_force_signed` | $`F_L^{\mathrm{signed}}(t)`$ | N | Reintegrated without absolute value |
-| `lamb_force_exposure` | $`F_L^{\mathrm{exposure}}(t)`$ | N | Published absolute-value exposure |
-| `wall_shear_stress` | $`\tau_w(t)`$ | Pa | Published tangential wall traction |
-| `lamb_force_isotropic` | $`F_L^{\mathrm{iso}}(t)`$ | N | Isotropic control |
-| `lamb_force_anisotropy_increment` | $`\Delta F_L^{\mathrm{aniso}}`$ | N | `total - isotropic` |
-| `force_ratio` | $`\chi(t)=\lvert F_r\rvert/\lvert F_z\rvert`$ | 1 | Published directional descriptor |
-| `force_angle` | $`\phi(t)`$ | rad | Published resultant angle |
-| `harmonic_frequency` | $`\omega_h=h\omega_0`$ | rad s⁻¹ | Derived |
-| `harmonic_complex_amplitudes` | $`\widehat G_h`$ | Pa m⁻¹ | Immutable source data |
-| `blood_density` | $`\rho`$ | kg m⁻³ | Exact published configuration value |
-| `axial_kinematic_viscosity` | $`\nu_{zz}`$ | m² s⁻¹ | Exact published configuration value |
-
-### 4.4 Anisotropy and numerical values
-
-| ID | Symbol | Frozen value/range | Unit | Source |
+| Parameter | Symbol | Frozen value/rule | Unit | Source |
 |---|---:|---:|---:|---|
-| `anisotropy_beta` | $`\beta=\nu_{z\theta}/\nu_{zz}`$ | `[-0.1, 0.1]` | 1 | Published study |
-| `anisotropy_gamma` | $`\gamma=\nu_{\theta z}/\nu_{zz}`$ | `[-0.1, 0.1]` | 1 | Published study |
-| `anisotropy_delta` | $`\delta=\nu_{\theta\theta}/\nu_{zz}`$ | `[0.9, 1.1]` | 1 | Published study |
-| `isotropic_beta` | $`\beta`$ | 0 | 1 | Exact isotropic limit |
-| `isotropic_gamma` | $`\gamma`$ | 0 | 1 | Exact isotropic limit |
-| `isotropic_delta` | $`\delta`$ | 1 | 1 | Exact isotropic limit |
-| `radial_spectral_order` | $`N`$ | 150 | nodes | Published production resolution |
-| `time_points_per_cycle` | $`N_t`$ | 2048 | samples | Frozen publication workflow |
-| `near_wall_quadrature_points` | $`N_q`$ | 256 | points | Frozen publication workflow |
-| `harmonic_reconstruction_error` | — | `< 1e-3` | normalized RMS | Published truncation rule |
+| Anisotropy ratio | $`\beta=\nu_{z\theta}/\nu_{zz}`$ | `[-0.1, 0.1]` | 1 | Ground-truth paper |
+| Anisotropy ratio | $`\gamma=\nu_{\theta z}/\nu_{zz}`$ | `[-0.1, 0.1]` | 1 | Ground-truth paper |
+| Azimuthal viscosity ratio | $`\delta=\nu_{\theta\theta}/\nu_{zz}`$ | `[0.9, 1.1]` | 1 | Ground-truth paper |
+| Isotropic limit | $`(\beta,\gamma,\delta)`$ | `(0,0,1)` | 1 | Exact limit |
+| Radial collocation order | $`N`$ | 150 | nodes | Ground-truth paper |
+| Harmonic truncation | $`H`$ | RMS reconstruction error `<1e-3` | 1 | Ground-truth paper |
+| Fundamental frequency | $`\omega_0`$ | artery-specific source value | rad s⁻¹ | Waveform source |
+| Harmonic frequency | $`\omega_h=h\omega_0`$ | derived | rad s⁻¹ | Definition |
+| Blood density | $`\rho`$ | exact archived paper value | kg m⁻³ | Paper configuration |
+| Axial viscosity | $`\nu_{zz}`$ | exact archived paper value | m² s⁻¹ | Paper configuration |
+| Reference area | $`A_{\mathrm{ref}}`$ | exact archived paper value | m² | Paper configuration |
+| Fluid integration depth | $`\delta_f`$ | exact archived paper value | m | Paper configuration |
+
+The coupled model's time grid, quadrature order, and mesh density are selected only by convergence. They are not inherited constants.
+
+### Required fields
+
+| Field | Symbol | Unit |
+|---|---:|---:|
+| Signed Lamb-force density | $`f_r(r,t)`$ | N m⁻³ |
+| Signed area-normalized load | $`q_L(t)`$ | Pa |
+| Exposure force | $`F_L^{\mathrm{exposure}}(t)`$ | N |
+| WSS | $`\tau_w(t)`$ | Pa |
+| Isotropic field | $`f_r^{\mathrm{iso}}(r,t)`$ | N m⁻³ |
+| Anisotropy increment | $`\Delta f_r^{\mathrm{aniso}}`$ | N m⁻³ |
+| Harmonic amplitudes/phases | $`\widehat q_{L,h},\widehat\tau_{w,h},\varphi_h`$ | Pa, rad |
 
 ---
 
-## 5. Frozen cell geometry
+## 6. Frozen endothelial geometry
 
-The mechanical model must preserve `A_EC = 100 µm²` and `V_EC = 1000 µm³` for consistency with the hydrodynamic integration.
+The fluid integration depth $`\delta_f`$ is not endothelial cell height.
 
-### 5.1 Independent geometry parameters
-
-Only these geometry quantities are independent:
-
-| ID | Symbol | Frozen values | Unit | Grade | Source |
+| Parameter | Symbol | Frozen value/range | Unit | Grade | Source |
 |---|---:|---:|---:|---|---|
-| `cell_area` | $`A_{EC}`$ | 100 | µm² | Ground truth | Published picoNewton geometry |
-| `cell_volume` | $`V_{EC}`$ | 1000 | µm³ | Ground truth | Published picoNewton geometry |
-| `cell_aspect_ratio_native` | $`q`$ | 2.81 | 1 | B | Porcine carotid endothelial measurement |
-| `cell_aspect_ratio_stretched` | $`q`$ | 3.65 | 1 | B | Same study; elevated axial stretch |
-| `cortex_thickness` | $`h_c`$ | 0.10 | µm | C | Published endothelial multicomponent models |
-| `glycocalyx_thickness_low` | $`h_g`$ | 0.11 | µm | A | Direct AFM thin-layer interpretation |
-| `glycocalyx_thickness_reference` | $`h_g`$ | 0.50 | µm | C | Published mechanotransmission model |
-| `glycocalyx_thickness_high` | $`h_g`$ | 1.00 | µm | A/B | Direct AFM/confocal experimental envelope |
-| `nucleus_height` | $`h_n`$ | 2.50 | µm | C | Published endothelial geometry model |
-| `nucleus_center_height` | $`z_n`$ | 1.25 | µm | C | Published endothelial geometry model |
+| Streamwise footprint | $`L_x`$ | 36.0 | µm | C | Dabagh et al. 2014 |
+| Transverse footprint | $`L_z`$ | 32.1 | µm | C | Dabagh et al. 2014 |
+| Footprint area | $`A_{\mathrm{cell}}=L_xL_z`$ | 1155.6 | µm² | D | Derived |
+| Surface-height reference | $`h_{\mathrm{cell}}`$ | 5.0 | µm | C | Dabagh et al. 2014 |
+| Surface-height range | $`h_{\mathrm{cell}}`$ | 3.71–5.11 | µm | C | `4.41 ± 0.70 µm` source range |
+| Reference aspect ratio | $`q`$ | 1.12 | 1 | C | Dabagh et al. 2014 |
+| Aspect-ratio range | $`q`$ | 0.81–1.43 | 1 | C | `1.12 ± 0.31` source range |
+| Native arterial aspect ratio | $`q`$ | 2.81 | 1 | B | Han et al. |
+| Stretched arterial aspect ratio | $`q`$ | 3.65 | 1 | B | Han et al. |
+| Apical cortex thickness | $`h_c`$ | 0.10 | µm | C | Dabagh et al. |
+| Nuclear in-plane axes | $`a_n,b_n`$ | 8.0, 6.0 | µm | C | Dabagh et al. |
+| Nuclear height | $`h_n`$ | 2.50 | µm | C | Dabagh et al. |
 
-### 5.2 Derived geometry
-
-The cell footprint is elliptical. For aspect ratio $`q=a/b`$:
+For an area-preserving elliptical state with $`q=a/b`$:
 
 ```math
-a=\sqrt{\frac{A_{EC}q}{\pi}},
+a=\sqrt{\frac{A_{\mathrm{cell}}q}{\pi}},
 \qquad
-b=\sqrt{\frac{A_{EC}}{\pi q}}.
+b=\sqrt{\frac{A_{\mathrm{cell}}}{\pi q}}.
 ```
-
-The mechanical cell height is derived, not fitted:
-
-```math
-h_{cell}=\frac{V_{EC}}{A_{EC}}=10\ \mu\mathrm m.
-```
-
-Nuclear in-plane dimensions are scaled from the published endothelial model ratios rather than introduced as independent parameters:
-
-```math
-\frac{a_n}{a}=\frac{8}{18},
-\qquad
-\frac{b_n}{b}=\frac{6}{16.05}.
-```
-
-This preserves the source-model nucleus-to-cell proportions while maintaining the ground-truth cell area.
-
-### 5.3 Geometry sources
-
-- Han et al., arterial endothelial aspect ratios `2.81 ± 0.25` and `3.65 ± 0.38`: [PMCID PMC2823635](https://pmc.ncbi.nlm.nih.gov/articles/PMC2823635/), [PMID 18922530](https://pubmed.ncbi.nlm.nih.gov/18922530/).
-- Dabagh et al., seven-cell endothelial geometry, 500 nm glycocalyx, 100 nm cortex, and nucleus dimensions: [PMCID PMC5454307](https://pmc.ncbi.nlm.nih.gov/articles/PMC5454307/).
-- Marsh and Waugh, direct endothelial glycocalyx AFM protocol: [DOI 10.3791/50163](https://doi.org/10.3791/50163).
-- Gao and Lipowsky, endothelial glycocalyx composition and thickness: [DOI 10.1016/j.mvr.2010.06.005](https://doi.org/10.1016/j.mvr.2010.06.005).
 
 ---
 
-## 6. Frozen elastic material parameters
+## 7. Frozen material registry
 
-### 6.1 Constitutive rule
+### Glycocalyx
 
-The independent material inputs are Young's modulus `E` and Poisson ratio `nu`. Shear and bulk moduli must be derived:
+| Parameter | Symbol | Frozen set | Unit | Grade | Source |
+|---|---:|---:|---:|---|---|
+| Thickness | $`h_g`$ | `{0.11, 0.50, 1.00}` | µm | A–C | AFM/confocal studies and EC models |
+| Young modulus | $`E_g`$ | `{25, 390, 1000}` | Pa | A–C | AFM studies and EC models |
+| Poisson ratio | $`\nu_g`$ | `{0.45, 0.49}` | 1 | D | Near-incompressible bounds |
+| Primary rheology | — | elastic | — | D | No unsupported relaxation constant |
+
+Thickness and modulus from the same experimental interpretation are correlated and must not be independently recombined.
+
+### Cell body
 
 ```math
 G=\frac{E}{2(1+\nu)},
@@ -259,234 +221,123 @@ G=\frac{E}{2(1+\nu)},
 K=\frac{E}{3(1-2\nu)}.
 ```
 
-`E`, `G`, and `K` must never be sampled independently.
+| Component | Symbol | Frozen set/range | Unit | Grade | Source |
+|---|---:|---:|---:|---|---|
+| Apical cortex | $`E_c`$ | `{1000, 5600}` | Pa | B/C | EC model and HAEC AFM |
+| Cytosol | $`E_{\mathrm{cyt}}`$ | `500–1500` | Pa | A–C | Compression, AFM, EC models |
+| Nucleus in cell | $`E_n`$ | `5000–6000` | Pa | A/C | Compression and EC models |
+| Isolated-nucleus bound | $`E_n`$ | 8000 | Pa | A | Compression experiment |
+| Soft-component Poisson ratio | $`\nu`$ | `{0.45, 0.49}` | 1 | D | Near-incompressible bounds |
 
-### 6.2 Claim-bearing elastic registry
+`E`, `G`, and `K` must not be sampled independently.
 
-| Component | ID | Symbol | Frozen values | SI unit | Grade | Verifiable source |
-|---|---|---:|---:|---:|---|---|
-| Glycocalyx | `glycocalyx_modulus_low` | $`E_g`$ | 25 | Pa | A | Direct AFM, 110 nm layer |
-| Glycocalyx | `glycocalyx_modulus_reference` | $`E_g`$ | 390 | Pa | A/C | AFM envelope and endothelial FE reference |
-| Cortex | `cortex_modulus_reference` | $`E_c`$ | 1000 | Pa | C | Endothelial multicomponent FE model |
-| Cortex | `cortex_modulus_high` | $`E_c`$ | 5600 | Pa | B | Human aortic EC AFM over cytoskeletal structures |
-| Cytosol | `cytosol_modulus_low` | $`E_{cyt}`$ | 500 | Pa | A/B | Endothelial cell compression and FE fit |
-| Cytosol | `cytosol_modulus_high` | $`E_{cyt}`$ | 1500 | Pa | B | Human aortic EC AFM adjacent cytoplasm |
-| Nucleus | `nucleus_modulus_reference` | $`E_n`$ | 5000 | Pa | A/B | Endothelial cell compression and FE fit |
-| Nucleus | `nucleus_modulus_high` | $`E_n`$ | 8000 | Pa | A/B | Isolated endothelial nuclei |
-| All soft components | `poisson_ratio_primary` | $`\nu`$ | 0.45 | 1 | D | Near-incompressible lower structural limit |
-| All soft components | `poisson_ratio_upper` | $`\nu`$ | 0.49 | 1 | D | Near-incompressible upper structural limit |
-
-### 6.3 Elastic sources
-
-- Endothelial glycocalyx thickness `110 nm` and modulus `0.025 kPa`, plus whole-cell modulus `3.0–6.5 kPa`: [PMID 32135082](https://pubmed.ncbi.nlm.nih.gov/32135082/).
-- HUVEC glycocalyx development and mechanical properties: [DOI 10.1098/rsif.2011.0901](https://doi.org/10.1098/rsif.2011.0901).
-- Cytoplasm approximately `500 Pa`, in-cell nucleus approximately `5000 Pa`, isolated nucleus approximately `8000 Pa`: [PMID 11784536](https://pubmed.ncbi.nlm.nih.gov/11784536/).
-- Endothelial FE reference values `500 Pa` cytosol, `6000 Pa` nucleus, `1000 Pa` cortex, and `390 Pa` glycocalyx: [PMCID PMC4233691](https://pmc.ncbi.nlm.nih.gov/articles/PMC4233691/).
-- Human aortic endothelial cytoskeletal-region and adjacent-cytoplasm stiffness measurements: [PMID 16524328](https://pubmed.ncbi.nlm.nih.gov/16524328/).
-
----
-
-## 7. Frozen viscoelastic extension
-
-The **primary claim must pass both elastic limits** before the viscoelastic extension is interpreted.
-
-Each viscoelastic component uses a standard-linear-solid complex modulus:
+### Viscoelastic robustness
 
 ```math
-E^*(\omega)
-=
-E_{\infty}
-+
-(E_0-E_{\infty})
-\frac{i\omega\tau}{1+i\omega\tau}.
+E^*(\omega)=E_\infty+(E_0-E_\infty)\frac{i\omega\tau}{1+i\omega\tau}.
 ```
 
-Only `E0`, `Einf`, and `tau` are independent.
+| Component | Relaxation time | Unit | Grade |
+|---|---:|---:|---|
+| Apical cortex | 0.01–0.10 | s | C |
+| Cytosol | 1.0–5.0 | s | C |
+| Nucleus | 0.10–0.50 | s | C |
 
-| Component | ID | Frozen range | Unit | Grade | Use |
-|---|---|---:|---:|---|---|
-| Apical cortex | `cortex_relaxation_time` | 0.01–0.10 | s | C | Secondary frequency-response analysis |
-| Cytosol | `cytosol_relaxation_time` | 1.0–5.0 | s | C | Secondary low-frequency support |
-| Nucleus | `nucleus_relaxation_time` | 0.10–0.50 | s | C | Secondary nuclear-support analysis |
-| Glycocalyx | — | none | — | — | Elastic in primary model; no unsupported relaxation constant |
-
-Frozen modulus-ratio brackets:
-
-```text
-E0 / Einf ∈ {1, 2, 5}
-```
-
-These are three discrete structural brackets, not a continuously fitted parameter.
-
-Sources:
-
-- Endothelial multicomponent dynamic model and material architecture: [PMCID PMC5454307](https://pmc.ncbi.nlm.nih.gov/articles/PMC5454307/).
-- Dynamic endothelial nuclear/cytoplasmic stiffness modeling under physiological shear: [PMCID PMC10627551](https://pmc.ncbi.nlm.nih.gov/articles/PMC10627551/).
-- Direction-dependent endothelial cytoplasmic rheology: [PMCID PMC2563098](https://pmc.ncbi.nlm.nih.gov/articles/PMC2563098/).
+The modulus-ratio set is `E0/Einf ∈ {1, 2, 5}`. The primary claim must first pass the elastic bounds.
 
 ---
 
-## 8. Parameters explicitly excluded from tuning
+## 8. Structural model classes
 
-The following are prohibited as free parameters in the claim-bearing model:
+- **Load distribution:** `uniform_apical`, `glycocalyx_resolved`, `localized_bound`.
+- **Lateral support:** `periodic_monolayer`, `compliant_edge`, `clamped_edge`.
+- **Membrane–cortex coupling:** `perfectly_bonded`, `tangential_slip_limit`.
+- **Nuclear representation:** `homogeneous_cell_body`, `stiff_nuclear_region`.
+- **Prestress:** zero in the primary model; nonzero prestress requires a separately sourced freeze.
 
-| Excluded parameter | Frozen treatment |
-|---|---|
-| Lamb-force transfer efficiency | Removed; exact resultant conservation enforced |
-| Arbitrary loading area | Removed; `A_EC = 100 µm²` |
-| Independent cell length and width | Derived from area and aspect ratio |
-| Independent cell height | Derived from `V_EC/A_EC` |
-| Independent `E`, `G`, and `K` | `G` and `K` derived from `E` and `nu` |
-| Arbitrary localization factor | Replaced by three force-conserving structural models |
-| Baseline membrane prestress | Primary model fixed at zero; nonzero values prohibited until a direct endothelial source is registered |
-| Membrane pressure ceiling | Removed |
-| Piezo1 channel count | Outside scope |
-| Piezo1 spatial fraction | Outside scope |
-| Calcium conversion gain | Outside scope |
-| Active contractile force | Outside primary scope |
-| Focal-adhesion molecular count | Outside primary scope |
-| Adherens-junction molecular count | Outside primary scope |
-| Universal biological threshold | Prohibited; biological meaning requires convergent evidence |
+The main conclusion may not depend only on a concentrated load, clamped boundary, or single nuclear representation.
 
 ---
 
-## 9. Frozen structural model classes
+## 9. Prohibited free parameters
 
-These are categorical models, not continuous fit parameters.
+The claim-bearing model cannot contain:
 
-### 9.1 Normal Lamb-load distribution
-
-All cases conserve the same signed resultant.
-
-1. `uniform_apical` — uniform normal load over the complete `A_EC`.
-2. `glycocalyx_continuum` — distribution obtained from the solved glycocalyx layer.
-3. `peripheral_upper_bound` — peripheral concentration normalized to conserve total force.
-
-The main conclusion must not depend only on `peripheral_upper_bound`.
-
-### 9.2 Boundary support
-
-1. `periodic_monolayer` — primary representation.
-2. `compliant_edge` — secondary finite-neighbour support.
-3. `clamped_edge` — stiff upper bound only.
-
-The main conclusion must not depend only on `clamped_edge`.
-
-### 9.3 Membrane–cortex attachment
-
-1. `perfectly_bonded`.
-2. `tangential_slip_limit`.
-
-No unmeasured adhesion coefficient may be introduced before a direct source is registered.
-
-### 9.4 Nuclear representation
-
-1. `homogeneous_foundation` — no explicit nucleus.
-2. `stiff_nuclear_patch` — source-scaled explicit nucleus.
-
-The main conclusion must remain qualitatively consistent under both.
+- Lamb-force transfer efficiency;
+- arbitrary equivalent-pressure conversion;
+- arbitrary loading area;
+- continuously fitted localization;
+- outcome-selected prestress;
+- independent sampling of `E`, `G`, and `K`;
+- artery-specific endothelial properties in the primary analysis;
+- a universal biological threshold;
+- any parameter adjusted after results are inspected.
 
 ---
 
-## 10. Frozen simulation matrix
+## 10. Required simulations
 
-Every artery must be solved under the same endothelial model for:
+For every artery, solve the same endothelial model for:
 
-1. unloaded cell;
+1. unloaded reference;
 2. WSS only;
-3. signed Lamb force only;
-4. WSS plus signed Lamb force;
+3. signed Lamb only;
+4. WSS plus signed Lamb;
 5. exposure-only diagnostic;
-6. isotropic Lamb component;
-7. anisotropy-specific Lamb increment;
-8. fundamental harmonic only;
-9. harmonics `h <= 2`;
-10. complete harmonic waveform;
-11. inward-only control;
-12. outward-only control;
-13. elastic instantaneous limit;
-14. elastic equilibrium limit;
-15. full viscoelastic model;
-16. zero-normal-load control;
-17. each load-distribution class;
-18. each boundary-support class;
-19. each membrane–cortex attachment class.
-
-No artery-specific endothelial parameters are permitted in the primary analysis.
+6. isotropic Lamb field;
+7. anisotropy-specific increment;
+8. fundamental only;
+9. harmonics $`h\le2`$;
+10. full waveform;
+11. inward-only and outward-only controls;
+12. zero-normal-load control;
+13. elastic bounds and viscoelastic extension;
+14. every structural model class.
 
 ---
 
 ## 11. Claim-bearing outputs
 
-The package must archive complete spatial and temporal fields, not only aggregate RMS values.
-
-| Output | Symbol | SI unit | Meaning |
-|---|---:|---:|---|
-| Maximum principal membrane tension | $`T_1(\mathbf{x},t)`$ | N m⁻¹ | Primary membrane mechanical state |
-| Lamb-induced incremental tension | $`\Delta T_1^L`$ | N m⁻¹ | Independent Lamb contribution with WSS present |
-| Maximum principal strain | $`\varepsilon_1`$ | 1 | Local deformation |
-| Normal displacement | $`w`$ | m | Wall-normal deformation |
-| Curvature change | $`\Delta\kappa`$ | m⁻¹ | Local membrane geometry change |
-| Glycocalyx strain | $`\varepsilon_g`$ | 1 | Glycocalyx compression/extension |
-| Glycocalyx reaction stress | $`\sigma_g`$ | Pa | Transmitted apical load |
-| Strain-energy density | $`U`$ | J m⁻³ | Stored mechanical energy |
-| Work per cycle | $`W_{\mathrm{cycle}}`$ | J | Repeated mechanical exposure |
-| Tension loading rate | $`\partial T_1/\partial t`$ | N m⁻¹ s⁻¹ | High-frequency mechanical stimulus |
-| Harmonic gain | $`G_h`$ | 1 | Mechanical transmission by harmonic |
-| Harmonic phase | $`\varphi_h`$ | rad | Phase lag |
-| Spatial peak-to-mean ratio | $`C_s`$ | 1 | Mechanical concentration |
-| Incremental Lamb/WSS norm ratio | $`\mathcal{R}_L`$ | 1 | Relative mechanical contribution |
-
-The primary incremental ratio is:
+| Output | Symbol | SI unit |
+|---|---:|---:|
+| Maximum principal membrane tension | $`T_1(\mathbf{x},t)`$ | N m⁻¹ |
+| Lamb-induced incremental tension | $`\Delta T_1^L`$ | N m⁻¹ |
+| Maximum principal strain | $`\varepsilon_1`$ | 1 |
+| Normal displacement | $`w`$ | m |
+| Curvature change | $`\Delta\kappa`$ | m⁻¹ |
+| Glycocalyx strain/reaction stress | $`\varepsilon_g,\sigma_g`$ | 1, Pa |
+| Strain-energy density | $`U`$ | J m⁻³ |
+| Work per cycle | $`W_{\mathrm{cycle}}`$ | J |
+| Tension loading rate | $`\partial T_1/\partial t`$ | N m⁻¹ s⁻¹ |
+| Harmonic gain/phase | $`G_h,\varphi_h`$ | 1, rad |
+| Spatial concentration | $`C_s`$ | 1 |
+| Incremental Lamb/WSS ratio | $`\mathcal R_L`$ | 1 |
 
 ```math
-\mathcal{R}_L
-=
-\frac{
-\left\|
-\mathbf{T}_m^{WSS+Lamb}
--
-\mathbf{T}_m^{WSS}
-\right\|
-}{
-\left\|
-\mathbf{T}_m^{WSS}
-\right\|
-}.
+\mathcal R_L=
+\frac{\left\|\mathbf T_m^{\mathrm{WSS+Lamb}}-\mathbf T_m^{\mathrm{WSS}}\right\|}
+{\left\|\mathbf T_m^{\mathrm{WSS}}\right\|}.
 ```
 
-Required summaries for every field:
-
-- peak;
-- RMS;
-- cycle mean;
-- 95th percentile;
-- peak-to-peak range;
-- time and location of peak;
-- spatial maximum-to-mean ratio;
-- harmonic magnitude and phase for `h = 1...6`;
-- signed inward/outward asymmetry;
-- cycle-integrated work.
+Each output requires peak, RMS, cycle mean, 95th percentile, peak-to-peak range, peak time/location, spatial concentration, signed asymmetry, harmonic magnitude/phase, and cycle-integrated work.
 
 ---
 
-## 12. Biological-meaningfulness decision rule
+## 12. Decision gates
 
-No single arbitrary force or tension threshold is permitted.
+The Lamb field is classified as computationally biologically meaningful only when all gates pass:
 
-The Lamb field is classified as **computationally biologically meaningful** only when all gates pass:
+1. incremental loading exceeds numerical error;
+2. the effect persists with WSS present;
+3. the effect is attributable to the anisotropy increment;
+4. predicted mechanics are consistent with documented endothelial scales;
+5. the result survives all registered parameter sets;
+6. the result survives all structural classes;
+7. the effect occurs in at least four of six arteries;
+8. the full waveform differs from the fundamental and $`h\le2`$ controls;
+9. the frozen protocol predates the scientific run.
 
-1. `numerical_significance` — incremental membrane loading exceeds the combined discretization and solver error floor;
-2. `wss_present` — the incremental effect persists in `WSS + Lamb`, not only in Lamb-only simulations;
-3. `anisotropy_attribution` — the effect is present in the anisotropy-specific increment and is not explained by the isotropic component;
-4. `experimental_scale_consistency` — predicted deformation, tension, stress, or local reaction force is consistent with experimentally observed endothelial mechanical scales;
-5. `parameter_robustness` — the result survives the complete registered glycocalyx, cortex, cytosol, and nuclear ranges;
-6. `structural_robustness` — the result survives the predeclared load-distribution, support, attachment, and nuclear model classes;
-7. `cross_artery_generality` — the predeclared effect passes in at least four of six arteries;
-8. `spectral_relevance` — the full waveform produces a resolved change in loading rate, phase, work, or peak tension relative to the `h=1` and `h<=2` controls;
-9. `no_post_hoc_tuning` — the exact freeze version predates the publication run.
-
-Allowed final classifications:
+Allowed classifications:
 
 ```text
 robustly_biologically_meaningful
@@ -500,117 +351,95 @@ negative_under_registered_model_domain
 
 ## 13. Verification requirements
 
-Before scientific runs are enabled, the package must pass:
+Before scientific runs:
 
-- source-data checksum verification;
-- reproduction of the published six-artery hydrodynamic outputs;
-- signed-force integration check;
-- isotropic-limit check;
-- total = isotropic + anisotropy-increment identity;
-- load-resultant conservation for every spatial distribution;
-- zero-load response;
-- rigid and zero-stiffness limits;
-- elastic instantaneous and equilibrium limits;
-- positive strain energy and viscoelastic dissipation;
-- mesh convergence;
-- temporal/harmonic convergence;
-- coordinate-rotation consistency;
-- deterministic rerun and archive checksums.
+- verify source checksums;
+- reproduce the published six-artery hydrodynamics;
+- recover the isotropic Womersley limit;
+- verify signed integration and units;
+- verify `total = isotropic + anisotropy increment`;
+- conserve the applied resultant;
+- pass zero-load, rigid, and zero-stiffness limits;
+- demonstrate positive elastic energy and non-negative dissipation;
+- demonstrate mesh, time, harmonic, and quadrature convergence;
+- verify coordinate consistency and deterministic archives.
 
 ---
 
-## 14. Machine-readable registry schema
+## 14. Machine-readable registry
 
-The implementation must reproduce this freeze in `parameters/parameter_registry.csv` or YAML with these fields:
+The implementation must mirror this README in version-controlled CSV or YAML with:
 
 ```text
-parameter_id
-symbol
-description
-si_unit
-frozen_value
-frozen_lower
-frozen_upper
-frozen_set
-source_doi
-source_url
-source_cell_type
-source_vascular_bed
-measurement_method
-source_strength
-independent_or_derived
-correlation_group
-primary_or_secondary
-claim_bearing
-transformation_rule
-notes
+parameter_id, symbol, description, si_unit,
+frozen_value, frozen_lower, frozen_upper, frozen_set,
+source_doi, source_url, source_cell_type, source_vascular_bed,
+measurement_method, source_strength, independent_or_derived,
+correlation_group, primary_or_secondary, claim_bearing,
+transformation_rule, notes
 ```
-
-Mandatory correlation groups:
-
-- `A_EC`, `V_EC`, and `h_cell`;
-- `A_EC`, aspect ratio, semi-major axis, and semi-minor axis;
-- `E`, `nu`, `G`, and `K`;
-- `E0`, `Einf`, and `tau`;
-- glycocalyx thickness and modulus when obtained from the same AFM interpretation.
 
 ---
 
-## 15. Verifiable source register
+## 15. Verifiable sources
 
-### Hydrodynamic ground truth
+### Hydrodynamic basis
 
-1. Saqr KM. *A transverse picoNewton force revealed in anisotropic Womersley flow.* Scientific Reports 16, 12584 (2026). [DOI 10.1038/s41598-026-47474-x](https://doi.org/10.1038/s41598-026-47474-x).
-2. Willemet M, Chowienczyk P, Alastruey J. Virtual healthy-subject arterial waveform database. [DOI 10.1152/ajpheart.00175.2015](https://doi.org/10.1152/ajpheart.00175.2015).
-
-### Endothelial glycocalyx
-
-3. Marsh G, Waugh RE. Direct AFM measurement protocol. [DOI 10.3791/50163](https://doi.org/10.3791/50163).
-4. Bai K, Wang W. Spatio-temporal glycocalyx development and mechanical properties. [DOI 10.1098/rsif.2011.0901](https://doi.org/10.1098/rsif.2011.0901).
-5. Endothelial glycocalyx thickness `110 nm` and modulus `0.025 kPa`. [PMID 32135082](https://pubmed.ncbi.nlm.nih.gov/32135082/).
-6. Weinbaum S, Tarbell JM, Damiano ER. Glycocalyx structure and function. [DOI 10.1146/annurev.bioeng.9.060906.151959](https://doi.org/10.1146/annurev.bioeng.9.060906.151959).
-7. Weinbaum et al. Glycocalyx mechanotransduction and cortical linkage. [DOI 10.1073/pnas.1332808100](https://doi.org/10.1073/pnas.1332808100).
+1. Saqr KM. _A transverse picoNewton force revealed in anisotropic Womersley flow._ [DOI 10.1038/s41598-026-47474-x](https://doi.org/10.1038/s41598-026-47474-x).
+2. Willemet M, Chowienczyk P, Alastruey J. Arterial waveform database. [DOI 10.1152/ajpheart.00175.2015](https://doi.org/10.1152/ajpheart.00175.2015).
 
 ### Endothelial geometry and mechanics
 
-8. Han et al. Arterial endothelial morphology under longitudinal stretch. [PMCID PMC2823635](https://pmc.ncbi.nlm.nih.gov/articles/PMC2823635/).
-9. Caille et al. Cytoplasmic and nuclear elastic moduli. [PMID 11784536](https://pubmed.ncbi.nlm.nih.gov/11784536/).
-10. Dabagh et al. Multicomponent endothelial force transmission. [PMCID PMC4233691](https://pmc.ncbi.nlm.nih.gov/articles/PMC4233691/).
-11. Dabagh et al. Oscillatory and multidirectional endothelial mechanotransmission. [PMCID PMC5454307](https://pmc.ncbi.nlm.nih.gov/articles/PMC5454307/).
-12. Ferko et al. Endothelial FE stress amplification around nucleus and focal adhesions. [PMID 17160699](https://pubmed.ncbi.nlm.nih.gov/17160699/).
-13. Human aortic endothelial AFM stiffness measurements. [PMID 16524328](https://pubmed.ncbi.nlm.nih.gov/16524328/).
-14. Dynamic nuclear/cytoplasmic stiffness under shear. [PMCID PMC10627551](https://pmc.ncbi.nlm.nih.gov/articles/PMC10627551/).
-15. Endothelial anisotropic rheology. [PMCID PMC2563098](https://pmc.ncbi.nlm.nih.gov/articles/PMC2563098/).
+3. Dabagh M et al. _Shear-induced force transmission in a multicomponent, multicell model of the endothelium._ [DOI 10.1098/rsif.2014.0431](https://doi.org/10.1098/rsif.2014.0431); [PMCID PMC4233691](https://pmc.ncbi.nlm.nih.gov/articles/PMC4233691/).
+4. Dabagh M et al. _Mechanotransmission in endothelial cells subjected to oscillatory and multi-directional shear flow._ [DOI 10.1098/rsif.2017.0185](https://doi.org/10.1098/rsif.2017.0185); [PMCID PMC5454307](https://pmc.ncbi.nlm.nih.gov/articles/PMC5454307/).
+5. Han et al. Arterial endothelial morphology under longitudinal stretch. [PMID 18922530](https://pubmed.ncbi.nlm.nih.gov/18922530/); [PMCID PMC2823635](https://pmc.ncbi.nlm.nih.gov/articles/PMC2823635/).
+6. Ferko et al. Endothelial stress amplification around cellular structures. [PMID 17160699](https://pubmed.ncbi.nlm.nih.gov/17160699/).
 
-### Direct membrane-mechanics comparison scales
+### Glycocalyx and apical transmission
 
-16. Endothelial membrane tether extraction mechanics. [PMCID PMC2990408](https://pmc.ncbi.nlm.nih.gov/articles/PMC2990408/).
-17. Spectrin–glycocalyx transmission into endothelial membrane tension. [DOI 10.1038/s41556-022-00953-5](https://doi.org/10.1038/s41556-022-00953-5).
+7. Bai K, Wang W. Glycocalyx development and mechanics. [DOI 10.1098/rsif.2011.0901](https://doi.org/10.1098/rsif.2011.0901).
+8. Marsh G, Waugh RE. Endothelial glycocalyx AFM protocol. [DOI 10.3791/50163](https://doi.org/10.3791/50163).
+9. Direct glycocalyx thickness/modulus measurement. [PMID 32135082](https://pubmed.ncbi.nlm.nih.gov/32135082/).
+10. Weinbaum S et al. Glycocalyx-mediated mechanotransduction. [DOI 10.1073/pnas.1332808100](https://doi.org/10.1073/pnas.1332808100).
+11. Glycocalyx–spectrin transmission into membrane tension. [DOI 10.1038/s41556-022-00953-5](https://doi.org/10.1038/s41556-022-00953-5).
 
----
+### Cortex, cytoplasm, and nucleus
 
-## 16. Change-control rule
-
-The parameter registry may change only through a pull request containing:
-
-- the proposed value or range;
-- the old and new source;
-- the source's cell type, vascular bed, and measurement method;
-- the reason the existing source is inadequate;
-- an impact analysis showing whether prior conclusions change;
-- a new `parameter_freeze_version`.
-
-Silent parameter changes are prohibited.
+12. Caille N et al. _Contribution of the nucleus to the mechanical properties of endothelial cells._ [DOI 10.1016/S0021-9290(01)00201-9](https://doi.org/10.1016/S0021-9290(01)00201-9); [PMID 11784536](https://pubmed.ncbi.nlm.nih.gov/11784536/).
+13. Costa KD et al. Human aortic endothelial AFM stiffness. [PMID 16524328](https://pubmed.ncbi.nlm.nih.gov/16524328/).
+14. Sato M et al. _Micromechanical Architecture of the Endothelial Cell Cortex._ [PMCID PMC1305044](https://pmc.ncbi.nlm.nih.gov/articles/PMC1305044/).
+15. Direction-dependent endothelial rheology. [PMCID PMC2563098](https://pmc.ncbi.nlm.nih.gov/articles/PMC2563098/).
 
 ---
 
-## 17. Current project status
+## 16. Change control and status
+
+Any change to a frozen value, source, structural class, or gate requires a new freeze version and an impact analysis. Silent changes and post-result tuning are prohibited.
 
 ```text
-repository state: protocol and parameter freeze
-solver state: not yet implemented
-scientific outcome: not yet evaluated
-claims enabled: false
+scope: endothelial membrane mechanics
+protocol: frozen at version 2.0.0
+implementation: not yet released
+claim-bearing results: not yet generated
 ```
 
-The next implementation artifact should be the machine-readable parameter registry corresponding exactly to this README, followed by verification tests before any claim-bearing simulation is run.
+The first implementation milestone is the machine-readable parameter registry, followed by analytical and numerical verification before any six-artery scientific run.
+
+---
+
+## Citation
+
+```bibtex
+@article{Saqr2026LambForce,
+  author  = {Saqr, Khalid M.},
+  title   = {A transverse picoNewton force revealed in anisotropic Womersley flow},
+  journal = {Scientific Reports},
+  year    = {2026},
+  volume  = {16},
+  pages   = {12584},
+  doi     = {10.1038/s41598-026-47474-x}
+}
+```
+
+**Author:** Khalid M. Saqr  
+**Contact:** `k.saqr@aast.edu`
