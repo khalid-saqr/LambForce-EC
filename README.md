@@ -78,23 +78,23 @@ This protocol does **not** claim zero biological uncertainty. It eliminates undo
 
 The mechanical solver must use the signed wall-normal resultant:
 
-\[
+```math
 F_{L}^{\mathrm{signed}}(t)
 =
 A_{\mathrm{EC}}
 \int_{R-\delta_{\mathrm{EC}}}^{R}
 \rho\,\ell_r(r,t)\,dr.
-\]
+```
 
 The absolute-value quantity remains a non-directional exposure measure:
 
-\[
+```math
 F_{L}^{\mathrm{exposure}}(t)
 =
 A_{\mathrm{EC}}
 \int_{R-\delta_{\mathrm{EC}}}^{R}
 \left|\rho\,\ell_r(r,t)\right|\,dr.
-\]
+```
 
 `F_L_signed` is the claim-bearing load. `F_L_exposure` is descriptive only.
 
@@ -102,11 +102,11 @@ A_{\mathrm{EC}}
 
 The model must not contain a free “Lamb-force transfer efficiency.” The applied normal load must conserve the published resultant:
 
-\[
+```math
 \int_{A_{\mathrm{EC}}} q_L(\mathbf{x},t)\,dA
 =
 F_{L}^{\mathrm{signed}}(t).
-\]
+```
 
 Any admissible spatial load-distribution model must satisfy this identity numerically.
 
@@ -116,13 +116,13 @@ Any admissible spatial load-distribution model must satisfy this identity numeri
 - Lamb forcing acts as a signed wall-normal resultant, `F_L_signed(t)` in N.
 - The principal comparison is the incremental membrane response:
 
-\[
+```math
 \Delta \mathbf{T}^{L}_{m}(\mathbf{x},t)
 =
 \mathbf{T}^{\mathrm{WSS+Lamb}}_{m}(\mathbf{x},t)
 -
 \mathbf{T}^{\mathrm{WSS}}_{m}(\mathbf{x},t).
-\]
+```
 
 The model does not attempt to reconstruct the Lamb field from WSS; that physical nonredundancy is already ground truth.
 
@@ -136,9 +136,9 @@ All source arrays must be imported from an immutable release of the published `p
 
 | ID | Symbol | Frozen value | SI unit | Status | Source |
 |---|---:|---:|---:|---|---|
-| `cell_footprint_area` | \(A_{\mathrm{EC}}\) | \(100\times10^{-12}\) | m² | Immutable | Published picoNewton baseline geometry |
-| `cell_control_volume` | \(V_{\mathrm{EC}}\) | \(1.0\times10^{-15}\) | m³ | Immutable | Published picoNewton baseline geometry |
-| `control_volume_depth` | \(\delta_{\mathrm{EC}}=V/A\) | \(1.0\times10^{-5}\) | m | Derived | Exact derivation from the two values above |
+| `cell_footprint_area` | $`A_{\mathrm{EC}}`$ | $`100\times10^{-12}`$ | m² | Immutable | Published picoNewton baseline geometry |
+| `cell_control_volume` | $`V_{\mathrm{EC}}`$ | $`1.0\times10^{-15}`$ | m³ | Immutable | Published picoNewton baseline geometry |
+| `control_volume_depth` | $`\delta_{\mathrm{EC}}=V/A`$ | $`1.0\times10^{-5}`$ | m | Derived | Exact derivation from the two values above |
 
 Equivalent human-readable values:
 
@@ -148,7 +148,7 @@ Equivalent human-readable values:
 
 ### 4.2 Six arterial inputs
 
-| Artery | Radius \(R\) (m) | Womersley \(\alpha\) | Six published signed harmonic amplitudes |
+| Artery | Radius $`R`$ (m) | Womersley $`\alpha`$ | Six published signed harmonic amplitudes |
 |---|---:|---:|---|
 | Aortic root | 0.0150 | 22.03 | `[1.00, 0.82, 0.54, 0.33, 0.24, 0.17]` |
 | Thoracic aorta | 0.0120 | 17.62 | `[1.00, 0.76, 0.45, 0.28, 0.20, 0.12]` |
@@ -161,32 +161,32 @@ Equivalent human-readable values:
 
 | ID | Symbol | Unit | Frozen rule |
 |---|---:|---:|---|
-| `lamb_density_signed` | \(f_r(r,t)=\rho\ell_r\) | N m⁻³ | Full signed radial field |
-| `lamb_force_signed` | \(F_L^{signed}(t)\) | N | Reintegrated without absolute value |
-| `lamb_force_exposure` | \(F_L^{exposure}(t)\) | N | Published absolute-value exposure |
-| `wall_shear_stress` | \(\tau_w(t)\) | Pa | Published tangential wall traction |
-| `lamb_force_isotropic` | \(F_L^{iso}(t)\) | N | Isotropic control |
-| `lamb_force_anisotropy_increment` | \(\Delta F_L^{aniso}\) | N | `total - isotropic` |
-| `force_ratio` | \(\chi(t)=|F_r|/|F_z|\) | 1 | Published directional descriptor |
-| `force_angle` | \(\phi(t)\) | rad | Published resultant angle |
-| `harmonic_frequency` | \(\omega_h=h\omega_0\) | rad s⁻¹ | Derived |
-| `harmonic_complex_amplitudes` | \(\widehat G_h\) | Pa m⁻¹ | Immutable source data |
-| `blood_density` | \(\rho\) | kg m⁻³ | Exact published configuration value |
-| `axial_kinematic_viscosity` | \(\nu_{zz}\) | m² s⁻¹ | Exact published configuration value |
+| `lamb_density_signed` | $`f_r(r,t)=\rho\ell_r`$ | N m⁻³ | Full signed radial field |
+| `lamb_force_signed` | $`F_L^{\mathrm{signed}}(t)`$ | N | Reintegrated without absolute value |
+| `lamb_force_exposure` | $`F_L^{\mathrm{exposure}}(t)`$ | N | Published absolute-value exposure |
+| `wall_shear_stress` | $`\tau_w(t)`$ | Pa | Published tangential wall traction |
+| `lamb_force_isotropic` | $`F_L^{\mathrm{iso}}(t)`$ | N | Isotropic control |
+| `lamb_force_anisotropy_increment` | $`\Delta F_L^{\mathrm{aniso}}`$ | N | `total - isotropic` |
+| `force_ratio` | $`\chi(t)=\lvert F_r\rvert/\lvert F_z\rvert`$ | 1 | Published directional descriptor |
+| `force_angle` | $`\phi(t)`$ | rad | Published resultant angle |
+| `harmonic_frequency` | $`\omega_h=h\omega_0`$ | rad s⁻¹ | Derived |
+| `harmonic_complex_amplitudes` | $`\widehat G_h`$ | Pa m⁻¹ | Immutable source data |
+| `blood_density` | $`\rho`$ | kg m⁻³ | Exact published configuration value |
+| `axial_kinematic_viscosity` | $`\nu_{zz}`$ | m² s⁻¹ | Exact published configuration value |
 
 ### 4.4 Anisotropy and numerical values
 
 | ID | Symbol | Frozen value/range | Unit | Source |
 |---|---:|---:|---:|---|
-| `anisotropy_beta` | \(\beta=\nu_{z\theta}/\nu_{zz}\) | `[-0.1, 0.1]` | 1 | Published study |
-| `anisotropy_gamma` | \(\gamma=\nu_{\theta z}/\nu_{zz}\) | `[-0.1, 0.1]` | 1 | Published study |
-| `anisotropy_delta` | \(\delta=\nu_{\theta\theta}/\nu_{zz}\) | `[0.9, 1.1]` | 1 | Published study |
-| `isotropic_beta` | \(\beta\) | 0 | 1 | Exact isotropic limit |
-| `isotropic_gamma` | \(\gamma\) | 0 | 1 | Exact isotropic limit |
-| `isotropic_delta` | \(\delta\) | 1 | 1 | Exact isotropic limit |
-| `radial_spectral_order` | \(N\) | 150 | nodes | Published production resolution |
-| `time_points_per_cycle` | \(N_t\) | 2048 | samples | Frozen publication workflow |
-| `near_wall_quadrature_points` | \(N_q\) | 256 | points | Frozen publication workflow |
+| `anisotropy_beta` | $`\beta=\nu_{z\theta}/\nu_{zz}`$ | `[-0.1, 0.1]` | 1 | Published study |
+| `anisotropy_gamma` | $`\gamma=\nu_{\theta z}/\nu_{zz}`$ | `[-0.1, 0.1]` | 1 | Published study |
+| `anisotropy_delta` | $`\delta=\nu_{\theta\theta}/\nu_{zz}`$ | `[0.9, 1.1]` | 1 | Published study |
+| `isotropic_beta` | $`\beta`$ | 0 | 1 | Exact isotropic limit |
+| `isotropic_gamma` | $`\gamma`$ | 0 | 1 | Exact isotropic limit |
+| `isotropic_delta` | $`\delta`$ | 1 | 1 | Exact isotropic limit |
+| `radial_spectral_order` | $`N`$ | 150 | nodes | Published production resolution |
+| `time_points_per_cycle` | $`N_t`$ | 2048 | samples | Frozen publication workflow |
+| `near_wall_quadrature_points` | $`N_q`$ | 256 | points | Frozen publication workflow |
 | `harmonic_reconstruction_error` | — | `< 1e-3` | normalized RMS | Published truncation rule |
 
 ---
@@ -201,40 +201,40 @@ Only these geometry quantities are independent:
 
 | ID | Symbol | Frozen values | Unit | Grade | Source |
 |---|---:|---:|---:|---|---|
-| `cell_area` | \(A_{EC}\) | 100 | µm² | Ground truth | Published picoNewton geometry |
-| `cell_volume` | \(V_{EC}\) | 1000 | µm³ | Ground truth | Published picoNewton geometry |
-| `cell_aspect_ratio_native` | \(q\) | 2.81 | 1 | B | Porcine carotid endothelial measurement |
-| `cell_aspect_ratio_stretched` | \(q\) | 3.65 | 1 | B | Same study; elevated axial stretch |
-| `cortex_thickness` | \(h_c\) | 0.10 | µm | C | Published endothelial multicomponent models |
-| `glycocalyx_thickness_low` | \(h_g\) | 0.11 | µm | A | Direct AFM thin-layer interpretation |
-| `glycocalyx_thickness_reference` | \(h_g\) | 0.50 | µm | C | Published mechanotransmission model |
-| `glycocalyx_thickness_high` | \(h_g\) | 1.00 | µm | A/B | Direct AFM/confocal experimental envelope |
-| `nucleus_height` | \(h_n\) | 2.50 | µm | C | Published endothelial geometry model |
-| `nucleus_center_height` | \(z_n\) | 1.25 | µm | C | Published endothelial geometry model |
+| `cell_area` | $`A_{EC}`$ | 100 | µm² | Ground truth | Published picoNewton geometry |
+| `cell_volume` | $`V_{EC}`$ | 1000 | µm³ | Ground truth | Published picoNewton geometry |
+| `cell_aspect_ratio_native` | $`q`$ | 2.81 | 1 | B | Porcine carotid endothelial measurement |
+| `cell_aspect_ratio_stretched` | $`q`$ | 3.65 | 1 | B | Same study; elevated axial stretch |
+| `cortex_thickness` | $`h_c`$ | 0.10 | µm | C | Published endothelial multicomponent models |
+| `glycocalyx_thickness_low` | $`h_g`$ | 0.11 | µm | A | Direct AFM thin-layer interpretation |
+| `glycocalyx_thickness_reference` | $`h_g`$ | 0.50 | µm | C | Published mechanotransmission model |
+| `glycocalyx_thickness_high` | $`h_g`$ | 1.00 | µm | A/B | Direct AFM/confocal experimental envelope |
+| `nucleus_height` | $`h_n`$ | 2.50 | µm | C | Published endothelial geometry model |
+| `nucleus_center_height` | $`z_n`$ | 1.25 | µm | C | Published endothelial geometry model |
 
 ### 5.2 Derived geometry
 
-The cell footprint is elliptical. For aspect ratio \(q=a/b\):
+The cell footprint is elliptical. For aspect ratio $`q=a/b`$:
 
-\[
+```math
 a=\sqrt{\frac{A_{EC}q}{\pi}},
 \qquad
 b=\sqrt{\frac{A_{EC}}{\pi q}}.
-\]
+```
 
 The mechanical cell height is derived, not fitted:
 
-\[
+```math
 h_{cell}=\frac{V_{EC}}{A_{EC}}=10\ \mu\mathrm m.
-\]
+```
 
 Nuclear in-plane dimensions are scaled from the published endothelial model ratios rather than introduced as independent parameters:
 
-\[
+```math
 \frac{a_n}{a}=\frac{8}{18},
 \qquad
 \frac{b_n}{b}=\frac{6}{16.05}.
-\]
+```
 
 This preserves the source-model nucleus-to-cell proportions while maintaining the ground-truth cell area.
 
@@ -253,11 +253,11 @@ This preserves the source-model nucleus-to-cell proportions while maintaining th
 
 The independent material inputs are Young's modulus `E` and Poisson ratio `nu`. Shear and bulk moduli must be derived:
 
-\[
+```math
 G=\frac{E}{2(1+\nu)},
 \qquad
 K=\frac{E}{3(1-2\nu)}.
-\]
+```
 
 `E`, `G`, and `K` must never be sampled independently.
 
@@ -265,16 +265,16 @@ K=\frac{E}{3(1-2\nu)}.
 
 | Component | ID | Symbol | Frozen values | SI unit | Grade | Verifiable source |
 |---|---|---:|---:|---:|---|---|
-| Glycocalyx | `glycocalyx_modulus_low` | \(E_g\) | 25 | Pa | A | Direct AFM, 110 nm layer |
-| Glycocalyx | `glycocalyx_modulus_reference` | \(E_g\) | 390 | Pa | A/C | AFM envelope and endothelial FE reference |
-| Cortex | `cortex_modulus_reference` | \(E_c\) | 1000 | Pa | C | Endothelial multicomponent FE model |
-| Cortex | `cortex_modulus_high` | \(E_c\) | 5600 | Pa | B | Human aortic EC AFM over cytoskeletal structures |
-| Cytosol | `cytosol_modulus_low` | \(E_{cyt}\) | 500 | Pa | A/B | Endothelial cell compression and FE fit |
-| Cytosol | `cytosol_modulus_high` | \(E_{cyt}\) | 1500 | Pa | B | Human aortic EC AFM adjacent cytoplasm |
-| Nucleus | `nucleus_modulus_reference` | \(E_n\) | 5000 | Pa | A/B | Endothelial cell compression and FE fit |
-| Nucleus | `nucleus_modulus_high` | \(E_n\) | 8000 | Pa | A/B | Isolated endothelial nuclei |
-| All soft components | `poisson_ratio_primary` | \(\nu\) | 0.45 | 1 | D | Near-incompressible lower structural limit |
-| All soft components | `poisson_ratio_upper` | \(\nu\) | 0.49 | 1 | D | Near-incompressible upper structural limit |
+| Glycocalyx | `glycocalyx_modulus_low` | $`E_g`$ | 25 | Pa | A | Direct AFM, 110 nm layer |
+| Glycocalyx | `glycocalyx_modulus_reference` | $`E_g`$ | 390 | Pa | A/C | AFM envelope and endothelial FE reference |
+| Cortex | `cortex_modulus_reference` | $`E_c`$ | 1000 | Pa | C | Endothelial multicomponent FE model |
+| Cortex | `cortex_modulus_high` | $`E_c`$ | 5600 | Pa | B | Human aortic EC AFM over cytoskeletal structures |
+| Cytosol | `cytosol_modulus_low` | $`E_{cyt}`$ | 500 | Pa | A/B | Endothelial cell compression and FE fit |
+| Cytosol | `cytosol_modulus_high` | $`E_{cyt}`$ | 1500 | Pa | B | Human aortic EC AFM adjacent cytoplasm |
+| Nucleus | `nucleus_modulus_reference` | $`E_n`$ | 5000 | Pa | A/B | Endothelial cell compression and FE fit |
+| Nucleus | `nucleus_modulus_high` | $`E_n`$ | 8000 | Pa | A/B | Isolated endothelial nuclei |
+| All soft components | `poisson_ratio_primary` | $`\nu`$ | 0.45 | 1 | D | Near-incompressible lower structural limit |
+| All soft components | `poisson_ratio_upper` | $`\nu`$ | 0.49 | 1 | D | Near-incompressible upper structural limit |
 
 ### 6.3 Elastic sources
 
@@ -292,14 +292,14 @@ The **primary claim must pass both elastic limits** before the viscoelastic exte
 
 Each viscoelastic component uses a standard-linear-solid complex modulus:
 
-\[
+```math
 E^*(\omega)
 =
 E_{\infty}
 +
 (E_0-E_{\infty})
 \frac{i\omega\tau}{1+i\omega\tau}.
-\]
+```
 
 Only `E0`, `Einf`, and `tau` are independent.
 
@@ -422,24 +422,24 @@ The package must archive complete spatial and temporal fields, not only aggregat
 
 | Output | Symbol | SI unit | Meaning |
 |---|---:|---:|---|
-| Maximum principal membrane tension | \(T_1(\mathbf{x},t)\) | N m⁻¹ | Primary membrane mechanical state |
-| Lamb-induced incremental tension | \(\Delta T_1^L\) | N m⁻¹ | Independent Lamb contribution with WSS present |
-| Maximum principal strain | \(\varepsilon_1\) | 1 | Local deformation |
-| Normal displacement | \(w\) | m | Wall-normal deformation |
-| Curvature change | \(\Delta\kappa\) | m⁻¹ | Local membrane geometry change |
-| Glycocalyx strain | \(\varepsilon_g\) | 1 | Glycocalyx compression/extension |
-| Glycocalyx reaction stress | \(\sigma_g\) | Pa | Transmitted apical load |
-| Strain-energy density | \(U\) | J m⁻³ | Stored mechanical energy |
-| Work per cycle | \(W_{cycle}\) | J | Repeated mechanical exposure |
-| Tension loading rate | \(\partial T_1/\partial t\) | N m⁻¹ s⁻¹ | High-frequency mechanical stimulus |
-| Harmonic gain | \(G_h\) | 1 | Mechanical transmission by harmonic |
-| Harmonic phase | \(\varphi_h\) | rad | Phase lag |
-| Spatial peak-to-mean ratio | \(C_s\) | 1 | Mechanical concentration |
-| Incremental Lamb/WSS norm ratio | \(\mathcal{R}_L\) | 1 | Relative mechanical contribution |
+| Maximum principal membrane tension | $`T_1(\mathbf{x},t)`$ | N m⁻¹ | Primary membrane mechanical state |
+| Lamb-induced incremental tension | $`\Delta T_1^L`$ | N m⁻¹ | Independent Lamb contribution with WSS present |
+| Maximum principal strain | $`\varepsilon_1`$ | 1 | Local deformation |
+| Normal displacement | $`w`$ | m | Wall-normal deformation |
+| Curvature change | $`\Delta\kappa`$ | m⁻¹ | Local membrane geometry change |
+| Glycocalyx strain | $`\varepsilon_g`$ | 1 | Glycocalyx compression/extension |
+| Glycocalyx reaction stress | $`\sigma_g`$ | Pa | Transmitted apical load |
+| Strain-energy density | $`U`$ | J m⁻³ | Stored mechanical energy |
+| Work per cycle | $`W_{\mathrm{cycle}}`$ | J | Repeated mechanical exposure |
+| Tension loading rate | $`\partial T_1/\partial t`$ | N m⁻¹ s⁻¹ | High-frequency mechanical stimulus |
+| Harmonic gain | $`G_h`$ | 1 | Mechanical transmission by harmonic |
+| Harmonic phase | $`\varphi_h`$ | rad | Phase lag |
+| Spatial peak-to-mean ratio | $`C_s`$ | 1 | Mechanical concentration |
+| Incremental Lamb/WSS norm ratio | $`\mathcal{R}_L`$ | 1 | Relative mechanical contribution |
 
 The primary incremental ratio is:
 
-\[
+```math
 \mathcal{R}_L
 =
 \frac{
@@ -453,7 +453,7 @@ The primary incremental ratio is:
 \mathbf{T}_m^{WSS}
 \right\|
 }.
-\]
+```
 
 Required summaries for every field:
 
