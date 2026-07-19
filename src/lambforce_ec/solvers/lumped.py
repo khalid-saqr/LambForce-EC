@@ -20,7 +20,7 @@ class LumpedSolution:
 
 class LumpedFoundationSolver:
     solver_id = "lumped_0d"
-    solver_version = "1.0.0"
+    solver_version = "2.0.0-phase0"
 
     def solve(
         self,

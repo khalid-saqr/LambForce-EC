@@ -1,0 +1,33 @@
+registry_version: 2.0.0
+selection_rule: full_cartesian_product
+classes:
+  load_distribution:
+    - uniform_apical
+    - glycocalyx_resolved
+    - localized_bound
+  lateral_support:
+    - periodic_monolayer
+    - compliant_edge
+    - clamped_edge
+  membrane_cortex_coupling:
+    - perfectly_bonded
+    - tangential_slip_limit
+  nuclear_representation:
+    - homogeneous_cell_body
+    - stiff_nuclear_region
+  prestress_state:
+    - zero
+solver_mapping:
+  periodic_monolayer: periodic_spectral_2d
+  compliant_edge: bounded_fd_2d
+  clamped_edge: bounded_fd_2d
+mathematical_limits:
+  compliant_edge: simply_supported_discrete_plate_bound
+  clamped_edge: zero_displacement_zero_slope_ghost_node_bound
+  tangential_slip_limit: zero_direct_wss_membrane_tension_transfer
+  stiff_nuclear_region: nucleus_modulus_over_nucleus_height_foundation_region
+prohibited:
+  - continuously_fitted_localization
+  - outcome_selected_support
+  - outcome_selected_nuclear_representation
+  - nonzero_prestress_without_new_freeze

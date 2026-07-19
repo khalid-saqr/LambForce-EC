@@ -48,6 +48,8 @@ def assert_conserved(
     tolerance_relative: float,
     label: str,
 ) -> None:
+    if abs(applied) < 1e-30 and abs(reaction) < 1e-30:
+        return
     error = relative_error(reaction, applied)
     if error > tolerance_relative:
         raise ConservationError(

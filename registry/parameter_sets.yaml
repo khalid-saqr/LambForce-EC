@@ -1,0 +1,26 @@
+registry_version: 2.0.0
+primary_rheology: elastic
+glycocalyx_correlation_group:
+  thin_stiff:
+    thickness_m: 1.10e-7
+    modulus_pa: 1000.0
+  reference:
+    thickness_m: 5.00e-7
+    modulus_pa: 390.0
+  thick_soft:
+    thickness_m: 1.00e-6
+    modulus_pa: 25.0
+elastic_bounds:
+  cortex_modulus_pa: [1000.0, 5600.0]
+  cytosol_modulus_pa: [500.0, 1500.0]
+  nucleus_modulus_pa: [5000.0, 6000.0, 8000.0]
+  poisson_ratio: [0.45, 0.49]
+viscoelastic_extension:
+  ratio_e0_einf: [1.0, 2.0, 5.0]
+  cortex_relaxation_time_s: [0.01, 0.10]
+  cytosol_relaxation_time_s: [1.0, 5.0]
+  nucleus_relaxation_time_s: [0.10, 0.50]
+derivation_rules:
+  shear_modulus: G=E/[2(1+nu)]
+  bulk_modulus: K=E/[3(1-2nu)]
+  independent_sampling_of_E_G_K: prohibited

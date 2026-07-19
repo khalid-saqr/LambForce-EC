@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 import re
 import numpy as np
@@ -8,6 +8,31 @@ import numpy as np
 from .exceptions import ValidationError
 
 _SHA256 = re.compile(r"^[0-9a-f]{64}$")
+
+GLYCOCALYX_STATES: dict[str, tuple[float, float]] = {
+    "thin_stiff": (0.11e-6, 1000.0),
+    "reference": (0.50e-6, 390.0),
+    "thick_soft": (1.00e-6, 25.0),
+}
+
+LOAD_CASES = {
+    "unloaded",
+    "wss_only",
+    "lamb_signed_only",
+    "wss_plus_lamb_signed",
+    "isotropic_lamb",
+    "anisotropy_increment",
+    "exposure_diagnostic",
+    "inward_only",
+    "outward_only",
+    "zero_normal_load",
+}
+LATERAL_SUPPORTS = {"periodic_monolayer", "compliant_edge", "clamped_edge"}
+MEMBRANE_CORTEX_COUPLINGS = {"perfectly_bonded", "tangential_slip_limit"}
+NUCLEAR_REPRESENTATIONS = {"homogeneous_cell_body", "stiff_nuclear_region"}
+RHEOLOGY_MODES = {"elastic", "sls"}
+HARMONIC_CONTROLS = {"fundamental_only", "harmonics_le_2", "full_waveform"}
+LOAD_DISTRIBUTIONS = {"uniform_apical", "localized_bound", "glycocalyx_resolved"}
 
 
 @dataclass(frozen=True)
@@ -17,6 +42,10 @@ class Geometry:
     cell_height_m: float = 5.0e-6
     cortex_thickness_m: float = 0.10e-6
     glycocalyx_thickness_m: float = 0.50e-6
+    glycocalyx_state_id: str = "reference"
+    nucleus_axis_x_m: float = 8.0e-6
+    nucleus_axis_z_m: float = 6.0e-6
+    nucleus_height_m: float = 2.50e-6
 
     @property
     def area_m2(self) -> float:
@@ -29,12 +58,21 @@ class Geometry:
             "cell_height_m": self.cell_height_m,
             "cortex_thickness_m": self.cortex_thickness_m,
             "glycocalyx_thickness_m": self.glycocalyx_thickness_m,
+            "nucleus_axis_x_m": self.nucleus_axis_x_m,
+            "nucleus_axis_z_m": self.nucleus_axis_z_m,
+            "nucleus_height_m": self.nucleus_height_m,
         }
         for name, value in values.items():
             if not np.isfinite(value) or value <= 0:
                 raise ValidationError(f"{name} must be finite and positive.")
         if self.cortex_thickness_m >= self.cell_height_m:
             raise ValidationError("cortex_thickness_m must be smaller than cell_height_m.")
+        if self.nucleus_height_m > self.cell_height_m:
+            raise ValidationError("nucleus_height_m cannot exceed cell_height_m.")
+        if self.nucleus_axis_x_m >= self.length_x_m or self.nucleus_axis_z_m >= self.length_z_m:
+            raise ValidationError("nuclear in-plane axes must fit inside the endothelial footprint.")
+        if self.glycocalyx_state_id not in GLYCOCALYX_STATES:
+            raise ValidationError(f"Unknown glycocalyx_state_id: {self.glycocalyx_state_id}")
 
 
 @dataclass(frozen=True)
@@ -51,6 +89,9 @@ class SLSMaterial:
         if not np.isfinite(self.relaxation_time_s) or self.relaxation_time_s <= 0:
             raise ValidationError(f"{name}.relaxation_time_s must be finite and positive.")
 
+    def elastic_limit(self) -> "SLSMaterial":
+        return replace(self, ratio_e0_einf=1.0)
+
 
 @dataclass(frozen=True)
 class MaterialState:
@@ -59,7 +100,8 @@ class MaterialState:
     glycocalyx: SLSMaterial = field(default_factory=lambda: SLSMaterial(390.0, 2.0, 0.10))
     nucleus: SLSMaterial = field(default_factory=lambda: SLSMaterial(5_000.0, 2.0, 0.25))
     poisson_ratio: float = 0.45
-    parameter_set_id: str = "reference_reduced_model_v1"
+    parameter_set_id: str = "reference_reduced_model_v2"
+    glycocalyx_state_id: str = "reference"
 
     def validate(self) -> None:
         self.cortex.validate("cortex")
@@ -70,6 +112,21 @@ class MaterialState:
             raise ValidationError("poisson_ratio is outside the stable isotropic range.")
         if not self.parameter_set_id.strip():
             raise ValidationError("parameter_set_id must be non-empty.")
+        if self.glycocalyx_state_id not in GLYCOCALYX_STATES:
+            raise ValidationError(f"Unknown glycocalyx_state_id: {self.glycocalyx_state_id}")
+
+    def for_rheology(self, mode: str) -> "MaterialState":
+        if mode not in RHEOLOGY_MODES:
+            raise ValidationError(f"Unsupported rheology_mode: {mode}")
+        if mode == "sls":
+            return self
+        return replace(
+            self,
+            cortex=self.cortex.elastic_limit(),
+            cytosol=self.cytosol.elastic_limit(),
+            glycocalyx=self.glycocalyx.elastic_limit(),
+            nucleus=self.nucleus.elastic_limit(),
+        )
 
 
 @dataclass
@@ -98,6 +155,8 @@ class ArteryRecord:
             raise ValidationError("omega0_rad_s must be finite and positive.")
         if not _SHA256.match(self.source_checksum):
             raise ValidationError("source_checksum must be a lowercase SHA-256 hexadecimal digest.")
+        if self.coordinate_convention != "outward_normal_positive":
+            raise ValidationError("coordinate_convention must be outward_normal_positive.")
         r = np.asarray(self.radial_coordinate_m, dtype=float)
         t = np.asarray(self.time_s, dtype=float)
         f = np.asarray(self.lamb_density_signed_n_m3, dtype=float)
@@ -136,33 +195,73 @@ class RunConfig:
     nx: int = 32
     nz: int = 32
     solver_id: str = "periodic_spectral_2d"
-    structural_model_id: str = "reduced_plate_foundation_series_glycocalyx_v1"
+    structural_model_id: str = "auto"
     load_distribution: str = "uniform_apical"
+    lateral_support: str = "periodic_monolayer"
+    membrane_cortex_coupling: str = "perfectly_bonded"
+    nuclear_representation: str = "homogeneous_cell_body"
+    prestress_state: str = "zero"
+    rheology_mode: str = "elastic"
     load_case: str = "wss_plus_lamb_signed"
     harmonic_control: str = "full_waveform"
     localized_sigma_x_fraction: float = 0.15
     localized_sigma_z_fraction: float = 0.15
     conservation_tolerance_relative: float = 1e-12
-    protocol_version: str = "1.0.0-step1"
+    numerical_tolerance_relative: float = 1e-10
+    protocol_version: str = "2.0.0"
     parameter_freeze_version: str = "2.0.0"
+    claim_bearing: bool = False
+
+    @property
+    def resolved_structural_model_id(self) -> str:
+        if self.structural_model_id != "auto":
+            return self.structural_model_id
+        return ":".join(
+            (
+                self.load_distribution,
+                self.lateral_support,
+                self.membrane_cortex_coupling,
+                self.nuclear_representation,
+                self.prestress_state,
+            )
+        )
 
     def validate(self) -> None:
-        if self.nx < 4 or self.nz < 4:
-            raise ValidationError("nx and nz must each be at least four.")
+        if self.nx < 6 or self.nz < 6:
+            raise ValidationError("nx and nz must each be at least six.")
         if self.solver_id not in {"periodic_spectral_2d", "bounded_fd_2d", "lumped_0d"}:
             raise ValidationError(f"Unsupported solver_id: {self.solver_id}")
-        if self.load_distribution not in {"uniform_apical", "localized_bound", "glycocalyx_resolved"}:
+        if self.load_distribution not in LOAD_DISTRIBUTIONS:
             raise ValidationError(f"Unsupported load_distribution: {self.load_distribution}")
-        if self.load_case not in {
-            "unloaded", "wss_only", "lamb_signed_only", "wss_plus_lamb_signed",
-            "isotropic_lamb", "anisotropy_increment", "exposure_diagnostic",
-        }:
+        if self.lateral_support not in LATERAL_SUPPORTS:
+            raise ValidationError(f"Unsupported lateral_support: {self.lateral_support}")
+        if self.membrane_cortex_coupling not in MEMBRANE_CORTEX_COUPLINGS:
+            raise ValidationError(
+                f"Unsupported membrane_cortex_coupling: {self.membrane_cortex_coupling}"
+            )
+        if self.nuclear_representation not in NUCLEAR_REPRESENTATIONS:
+            raise ValidationError(f"Unsupported nuclear_representation: {self.nuclear_representation}")
+        if self.prestress_state != "zero":
+            raise ValidationError(
+                "Only zero prestress is frozen. Nonzero prestress requires a new sourced freeze version."
+            )
+        if self.rheology_mode not in RHEOLOGY_MODES:
+            raise ValidationError(f"Unsupported rheology_mode: {self.rheology_mode}")
+        if self.load_case not in LOAD_CASES:
             raise ValidationError(f"Unsupported load_case: {self.load_case}")
-        if self.harmonic_control not in {"fundamental_only", "harmonics_le_2", "full_waveform"}:
+        if self.harmonic_control not in HARMONIC_CONTROLS:
             raise ValidationError(f"Unsupported harmonic_control: {self.harmonic_control}")
+        if self.lateral_support == "periodic_monolayer" and self.solver_id == "bounded_fd_2d":
+            raise ValidationError("periodic_monolayer requires periodic_spectral_2d for claim-bearing runs.")
+        if self.lateral_support != "periodic_monolayer" and self.solver_id == "periodic_spectral_2d":
+            raise ValidationError("bounded lateral supports require bounded_fd_2d.")
+        if self.solver_id == "lumped_0d" and self.claim_bearing:
+            raise ValidationError("lumped_0d is an analytical baseline and cannot be claim-bearing.")
         if not (0 < self.localized_sigma_x_fraction <= 0.5):
             raise ValidationError("localized_sigma_x_fraction must be in (0, 0.5].")
         if not (0 < self.localized_sigma_z_fraction <= 0.5):
             raise ValidationError("localized_sigma_z_fraction must be in (0, 0.5].")
-        if self.conservation_tolerance_relative <= 0:
-            raise ValidationError("conservation_tolerance_relative must be positive.")
+        if self.conservation_tolerance_relative <= 0 or self.numerical_tolerance_relative <= 0:
+            raise ValidationError("numerical tolerances must be positive.")
+        if self.protocol_version != "2.0.0" or self.parameter_freeze_version != "2.0.0":
+            raise ValidationError("Claim-bearing protocol and parameter freeze versions must be 2.0.0.")

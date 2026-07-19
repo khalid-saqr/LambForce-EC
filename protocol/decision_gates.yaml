@@ -1,0 +1,36 @@
+protocol_version: 2.0.0
+gates:
+  numerical_significance:
+    required: true
+    rule: incremental response exceeds combined discretization, quadrature, harmonic, and solver error
+  wss_present:
+    required: true
+    rule: effect exists in WSS+Lamb relative to WSS-only
+  anisotropy_attribution:
+    required: true
+    rule: direct anisotropy-increment response is resolved and is not explained by isotropic control
+  experimental_scale_consistency:
+    required: true
+    rule: at least one mechanical output is consistent with a documented output-specific endothelial scale
+  parameter_robustness:
+    required: true
+    rule: classification survives all registered correlated parameter sets
+  structural_robustness:
+    required: true
+    rule: classification survives the full frozen structural Cartesian product
+  cross_artery_generality:
+    required: true
+    minimum_reference_arteries: 4
+    total_reference_arteries: 6
+  spectral_relevance:
+    required: true
+    comparators: [fundamental_only, harmonics_le_2, full_waveform]
+  no_post_hoc_tuning:
+    required: true
+    rule: protocol, software commit, sources, parameters, resolutions, and gate algorithms predate scientific runs
+allowed_classifications:
+  - robustly_biologically_meaningful
+  - mechanically_present_but_parameter_conditional
+  - mechanically_present_but_below_experimental_scale
+  - not_resolved_above_numerical_error
+  - negative_under_registered_model_domain
