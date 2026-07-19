@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lambforce-ec"
+version = "0.3.0"
+description = "Force-conserving endothelial mechanics interface for anisotropic near-wall Lamb forcing and WSS"
+readme = "docs/STEP3_ARCHITECTURE.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Khalid M. Saqr"}]
+dependencies = [
+  "numpy>=1.24",
+  "scipy>=1.10",
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.5"]
+
+[project.scripts]
+lambforce-ec = "lambforce_ec.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
