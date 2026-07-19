@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/khalid-saqr/LambForce-EC/schemas/artery_input.schema.json",
-  "title": "LambForce-EC artery metadata",
+  "title": "LambForce-EC standardized artery metadata",
   "type": "object",
   "required": [
     "artery_id",
@@ -15,59 +15,66 @@
     "conversion_manifest_sha256",
     "converter_commit_sha",
     "record_payload_sha256",
-    "coordinate_convention"
+    "coordinate_convention",
+    "metadata"
   ],
   "properties": {
-    "artery_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "artery_name": {
-      "type": "string",
-      "minLength": 1
-    },
-    "radius_m": {
-      "type": "number",
-      "exclusiveMinimum": 0
-    },
-    "omega0_rad_s": {
-      "type": "number",
-      "exclusiveMinimum": 0
-    },
-    "source_identifier": {
-      "type": "string",
-      "minLength": 1
-    },
-    "source_version": {
-      "type": "string",
-      "minLength": 1
-    },
+    "artery_id": {"type": "string", "minLength": 1},
+    "artery_name": {"type": "string", "minLength": 1},
+    "radius_m": {"type": "number", "exclusiveMinimum": 0},
+    "omega0_rad_s": {"type": "number", "exclusiveMinimum": 0},
+    "source_identifier": {"type": "string", "minLength": 1},
+    "source_version": {"type": "string", "minLength": 1},
     "source_archive_sha256": {
       "type": "string",
-      "pattern": "^[0-9a-f]{64}$"
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Compatibility alias for the canonical published-source snapshot digest."
     },
     "source_member_sha256": {
       "type": "string",
-      "pattern": "^[0-9a-f]{64}$"
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Compatibility alias for the exact published-source identity digest."
     },
     "conversion_manifest_sha256": {
       "type": "string",
-      "pattern": "^[0-9a-f]{64}$"
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "Compatibility alias for the reproduction-configuration digest."
     },
     "converter_commit_sha": {
       "type": "string",
-      "pattern": "^[0-9a-f]{40}$"
+      "pattern": "^[0-9a-f]{40}$",
+      "description": "Compatibility alias for the LambForce-EC reproduction commit."
     },
-    "record_payload_sha256": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{64}$"
-    },
-    "coordinate_convention": {
-      "const": "outward_normal_positive"
-    },
+    "record_payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "coordinate_convention": {"const": "outward_normal_positive"},
     "metadata": {
       "type": "object",
+      "required": ["published_source", "hydrodynamic_contract"],
       "properties": {
+        "published_source": {
+          "type": "object",
+          "required": [
+            "repository",
+            "repository_commit_sha",
+            "published_notebook_path",
+            "published_notebook_blob_sha",
+            "published_input_registry_sha256",
+            "reproduction_commit_sha",
+            "reproduction_configuration_sha256",
+            "reproduction_mode"
+          ],
+          "properties": {
+            "repository": {"const": "khalid-saqr/picoNewton"},
+            "repository_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "published_notebook_path": {"const": "picoNewton_v2.ipynb"},
+            "published_notebook_blob_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "published_input_registry_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "reproduction_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "reproduction_configuration_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "reproduction_mode": {"enum": ["historical_v2", "verified"]}
+          },
+          "additionalProperties": true
+        },
         "hydrodynamic_contract": {
           "type": "object",
           "required": [
@@ -76,57 +83,34 @@
             "reference_area_m2",
             "fluid_integration_depth_m",
             "womersley_alpha",
+            "published_womersley_alpha",
             "radial_collocation_order",
             "harmonic_rms_tolerance",
             "source_waveform_identifier",
-            "source_archive_member",
-            "archive_harmonics"
+            "source_notebook_path",
+            "source_repository_commit_sha",
+            "source_notebook_blob_sha",
+            "reproduction_mode",
+            "generated_harmonics"
           ],
           "properties": {
-            "rho_kg_m3": {
-              "type": "number",
-              "exclusiveMinimum": 0
-            },
-            "nu_zz_m2_s": {
-              "type": "number",
-              "exclusiveMinimum": 0
-            },
-            "reference_area_m2": {
-              "type": "number",
-              "exclusiveMinimum": 0
-            },
-            "fluid_integration_depth_m": {
-              "type": "number",
-              "exclusiveMinimum": 0
-            },
-            "womersley_alpha": {
-              "type": "number",
-              "exclusiveMinimum": 0
-            },
-            "radial_collocation_order": {
-              "type": "integer",
-              "minimum": 2
-            },
-            "harmonic_rms_tolerance": {
-              "type": "number",
-              "exclusiveMinimum": 0
-            },
-            "source_waveform_identifier": {
-              "type": "string",
-              "minLength": 1
-            },
-            "source_archive_member": {
-              "type": "string",
-              "minLength": 1
-            },
-            "archive_harmonics": {
+            "rho_kg_m3": {"type": "number", "exclusiveMinimum": 0},
+            "nu_zz_m2_s": {"type": "number", "exclusiveMinimum": 0},
+            "reference_area_m2": {"type": "number", "exclusiveMinimum": 0},
+            "fluid_integration_depth_m": {"type": "number", "exclusiveMinimum": 0},
+            "womersley_alpha": {"type": "number", "exclusiveMinimum": 0},
+            "radial_collocation_order": {"type": "integer", "minimum": 2},
+            "harmonic_rms_tolerance": {"type": "number", "exclusiveMinimum": 0},
+            "source_waveform_identifier": {"type": "string", "minLength": 1},
+            "source_notebook_path": {"const": "picoNewton_v2.ipynb"},
+            "source_repository_commit_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "source_notebook_blob_sha": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+            "reproduction_mode": {"enum": ["historical_v2", "verified"]},
+            "generated_harmonics": {
               "type": "object",
-              "required": [
-                "signed_lamb_load",
-                "isotropic_lamb_load",
-                "wall_shear_stress"
-              ]
-            }
+              "required": ["signed_lamb_load", "isotropic_lamb_load", "wall_shear_stress"]
+            },
+            "published_womersley_alpha": {"type": "number", "exclusiveMinimum": 0}
           },
           "additionalProperties": true
         }

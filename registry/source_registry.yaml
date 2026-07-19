@@ -1,7 +1,7 @@
-registry_version: 2.1.0-readiness
+registry_version: 3.0.0-published-source
 sources:
-  - source_identifier: doi:10.1038/s41598-026-47474-x#immutable-hydrodynamic-archive
-    source_version: pending_archive_ingestion
+  - source_identifier: github:khalid-saqr/picoNewton#picoNewton_v2.ipynb
+    source_version: 9d61c237cda75df338ce0383038f7765c886f503
     artery_ids:
       - aortic_root
       - thoracic_aorta
@@ -9,24 +9,34 @@ sources:
       - carotid
       - iliac
       - brachial
-    archive_status: awaiting_archive
-    archive_sha256: null
-    source_member_sha256_by_artery: {}
-    conversion_manifest_sha256_by_artery: {}
-    converter_commit_sha: null
+    source_status: frozen_published_source
+    repository_commit_sha: 4c3c36db0578373cc4e48d9d8c7e8a85944ed1cb
+    published_notebook_path: picoNewton_v2.ipynb
+    published_notebook_blob_sha: 9d61c237cda75df338ce0383038f7765c886f503
+    published_input_registry_sha256: d3b2aa5af41634f8a3931e8ab5cb34bee4487acc94633a4db54e46b11603ca96
+    reproduction_commit_sha: null
+    record_payload_sha256_by_mode_and_artery: {}
+    qualification_status: awaiting_six_artery_reproduction
     source_doi: 10.1038/s41598-026-47474-x
-    role: immutable_hydrodynamic_ground_truth
+    role: published_hydrodynamic_ground_truth
     claim_bearing: true
-    note: Phase 1 must attach and verify the exact archive and all six source members.
+    note: >-
+      The exact v2 notebook blob and frozen scalar/harmonic input registry are the source chain.
+      Claim-bearing mechanics remain blocked until both historical_v2 and verified records for all
+      six arteries are reproduced, regressed against a cold notebook execution, reviewed, and
+      registered by payload checksum.
   - source_identifier: synthetic://lambforce-ec/software-validation
-    source_version: 2.1.0-readiness
+    source_version: 3.0.0-published-source
     artery_ids:
       - synthetic_validation_artery
-    archive_status: synthetic_non_claim_bearing
-    archive_sha256: null
-    source_member_sha256_by_artery: {}
-    conversion_manifest_sha256_by_artery: {}
-    converter_commit_sha: null
+    source_status: synthetic_non_claim_bearing
+    repository_commit_sha: null
+    published_notebook_path: null
+    published_notebook_blob_sha: null
+    published_input_registry_sha256: null
+    reproduction_commit_sha: null
+    record_payload_sha256_by_mode_and_artery: {}
+    qualification_status: not_applicable
     source_doi: null
     role: software_validation_only
     claim_bearing: false

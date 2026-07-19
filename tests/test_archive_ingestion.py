@@ -1,80 +1,33 @@
-import numpy as np
-import yaml
+from pathlib import Path
 
-from lambforce_ec.archive import ingest_archive_member
-from lambforce_ec.io import load_artery_npz
-from lambforce_ec.loads import integrate_radial_density
-from lambforce_ec.synthetic import make_synthetic_artery
+from lambforce_ec.published_source import reproduce_all_six, verify_reproduction_directory
+from lambforce_ec.protocol import load_yaml
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
-def _harmonics(values):
-    coeff = np.fft.rfft(np.asarray(values, dtype=float)) / len(values)
-    return {
-        "magnitude": np.abs(coeff).tolist(),
-        "phase_rad": np.angle(coeff).tolist(),
+def test_all_six_published_source_reproduction_is_deterministic(tmp_path):
+    inputs = ROOT / "registry/published_v2_hydrodynamics.yaml"
+    first = reproduce_all_six(inputs, tmp_path / "first", "1" * 40, "verification")
+    second = reproduce_all_six(inputs, tmp_path / "second", "1" * 40, "verification")
+    assert first["status"] == "REPRODUCED_AWAITING_HISTORICAL_V2_ORACLE"
+    assert set(first["arteries"]) == {
+        "aortic_root", "thoracic_aorta", "femoral", "carotid", "iliac", "brachial"
     }
-
-
-def test_archive_ingestion_is_deterministic_and_checksums_every_layer(tmp_path):
-    base = make_synthetic_artery(
-        artery_id="femoral", radius_m=4.0e-3, n_radial=16, n_time=32
-    )
-    archive = tmp_path / "immutable-archive.bin"
-    archive.write_bytes(b"immutable archive fixture")
-    member = tmp_path / "femoral-member.npz"
-    np.savez_compressed(
-        member,
-        radial_coordinate_m=base.radial_coordinate_m,
-        time_s=base.time_s,
-        lamb_density_signed_n_m3=base.lamb_density_signed_n_m3,
-        lamb_density_isotropic_n_m3=base.lamb_density_isotropic_n_m3,
-        wall_shear_stress_pa=base.wall_shear_stress_pa,
-    )
-    total = integrate_radial_density(
-        base.radial_coordinate_m, base.lamb_density_signed_n_m3
-    )
-    isotropic = integrate_radial_density(
-        base.radial_coordinate_m, base.lamb_density_isotropic_n_m3
-    )
-    manifest = {
-        "artery_id": "femoral",
-        "artery_name": "Femoral",
-        "radius_m": base.radius_m,
-        "omega0_rad_s": base.omega0_rad_s,
-        "source_identifier": "doi:10.1038/s41598-026-47474-x#immutable-hydrodynamic-archive",
-        "source_version": "fixture-v1",
-        "coordinate_convention": "outward_normal_positive",
-        "hydrodynamic_contract": {
-            "rho_kg_m3": 1060.0,
-            "nu_zz_m2_s": 3.5e-6,
-            "reference_area_m2": 1.0e-10,
-            "fluid_integration_depth_m": float(
-                base.radial_coordinate_m[-1] - base.radial_coordinate_m[0]
-            ),
-            "womersley_alpha": 5.87,
-            "radial_collocation_order": 16,
-            "harmonic_rms_tolerance": 1.0e-12,
-            "source_waveform_identifier": "fixture:femoral",
-            "source_archive_member": member.name,
-            "archive_harmonics": {
-                "signed_lamb_load": _harmonics(total),
-                "isotropic_lamb_load": _harmonics(isotropic),
-                "wall_shear_stress": _harmonics(base.wall_shear_stress_pa),
-            },
-        },
+    hashes_first = {
+        (artery, mode): row["record_payload_sha256"]
+        for artery, data in first["arteries"].items()
+        for mode, row in data["modes"].items()
     }
-    manifest_path = tmp_path / "manifest.yaml"
-    manifest_path.write_text(yaml.safe_dump(manifest), encoding="utf-8")
-
-    first = ingest_archive_member(
-        archive, member, manifest_path, tmp_path / "first.npz", "1" * 40
-    )
-    second = ingest_archive_member(
-        archive, member, manifest_path, tmp_path / "second.npz", "1" * 40
-    )
-    assert first["record_payload_sha256"] == second["record_payload_sha256"]
-    assert first["source_archive_sha256"] == second["source_archive_sha256"]
-    assert first["source_member_sha256"] == second["source_member_sha256"]
-    loaded = load_artery_npz(tmp_path / "first.npz")
-    assert loaded.record_payload_sha256 == first["record_payload_sha256"]
-    assert loaded.source_member_sha256 == first["source_member_sha256"]
+    hashes_second = {
+        (artery, mode): row["record_payload_sha256"]
+        for artery, data in second["arteries"].items()
+        for mode, row in data["modes"].items()
+    }
+    assert len(hashes_first) == 12
+    assert hashes_first == hashes_second
+    registry = load_yaml(ROOT / "registry/source_registry.yaml")
+    verification = verify_reproduction_directory(tmp_path / "first", inputs, registry)
+    assert verification["records_verified"] == 12
+    assert verification["status"] == "PASS_WORKFLOW_READY_HISTORICAL_ORACLE_PENDING"
+    assert verification["claim_bearing"] is False

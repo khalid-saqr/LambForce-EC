@@ -1,4 +1,4 @@
-matrix_version: 2.1.0-readiness
+matrix_version: 3.0.0-published-source
 requirements:
 - requirement_id: R01
   readme_section: '1'
@@ -72,11 +72,12 @@ requirements:
   status: implemented
 - requirement_id: R11
   readme_section: '5'
-  requirement: Six artery hydrodynamic records resolve to immutable archive
-  implementation: registry/source_registry.yaml; src/lambforce_ec/archive.py; src/lambforce_ec/protocol.py
-  tests: tests/test_archive_integrity.py::test_claim_bearing_requires_full_archive_binding
-  outputs_or_gate: source gate
-  status: blocked_on_archive
+  requirement: Six artery hydrodynamic records reproduce the frozen published v2 source
+  implementation: registry/published_v2_hydrodynamics.yaml; src/lambforce_ec/published_source.py;
+    src/lambforce_ec/protocol.py
+  tests: tests/test_archive_ingestion.py::test_all_six_published_source_reproduction_is_deterministic
+  outputs_or_gate: source reproduction gate
+  status: blocked_on_source_reproduction
 - requirement_id: R12
   readme_section: '5'
   requirement: Isotropic limit and anisotropy increment are explicit
@@ -215,11 +216,12 @@ requirements:
   status: implemented
 - requirement_id: R31
   readme_section: '13'
-  requirement: Source checksum must resolve to verified archive
+  requirement: Source identity and standardized payloads must resolve to verified
+    published-source reproduction
   implementation: src/lambforce_ec/provenance.py; src/lambforce_ec/protocol.py; registry/source_registry.yaml
-  tests: tests/test_archive_integrity.py::test_tampered_record_payload_is_rejected
+  tests: tests/test_archive_integrity.py::test_claim_bearing_requires_verified_published_source
   outputs_or_gate: source gate
-  status: blocked_on_archive
+  status: blocked_on_source_reproduction
 - requirement_id: R32
   readme_section: '13'
   requirement: total equals isotropic plus anisotropy increment at input level

@@ -4,7 +4,6 @@ import argparse
 import json
 from pathlib import Path
 
-from .archive import ingest_archive_member, qualify_hydrodynamics, save_qualification_report
 from .io import (
     config_from_mapping,
     load_artery_npz,
@@ -20,6 +19,13 @@ from .protocol import (
     validate_source_registry,
     validate_traceability_matrix,
 )
+from .published_source import (
+    reproduce_all_six,
+    save_reproduction_verification,
+    validate_published_inputs,
+    validate_published_source_binding,
+    verify_reproduction_directory,
+)
 from .synthetic import make_synthetic_artery
 from .validation import sha256_file
 from .workflow import run_case
@@ -32,7 +38,9 @@ def build_parser() -> argparse.ArgumentParser:
     validate = sub.add_parser("validate", help="Validate an artery NPZ and its payload checksum.")
     validate.add_argument("input")
 
-    synthetic = sub.add_parser("synthetic", help="Create a non-claim-bearing software-validation input.")
+    synthetic = sub.add_parser(
+        "synthetic", help="Create a non-claim-bearing software-validation input."
+    )
     synthetic.add_argument("output")
 
     run = sub.add_parser("run", help="Run one registered mechanics case.")
@@ -49,26 +57,31 @@ def build_parser() -> argparse.ArgumentParser:
     phase0.add_argument("--traceability")
     phase0.add_argument("--source-registry")
     phase0.add_argument("--reference-arteries")
+    phase0.add_argument("--published-inputs")
     phase0.add_argument(
         "--repository-root",
         help="Repository root for strict path/test/README traceability checks.",
     )
 
-    ingest = sub.add_parser(
-        "ingest-archive",
-        help="Deterministically convert one immutable hydrodynamic archive member.",
+    reproduce = sub.add_parser(
+        "reproduce-hydrodynamics",
+        help="Reproduce all six published hydrodynamic records from the frozen v2 source inputs.",
     )
-    ingest.add_argument("--archive", required=True)
-    ingest.add_argument("--member-npz", required=True)
-    ingest.add_argument("--manifest", required=True)
-    ingest.add_argument("--output", required=True)
-    ingest.add_argument("--converter-commit", required=True)
+    reproduce.add_argument("--published-inputs")
+    reproduce.add_argument("--output", required=True)
+    reproduce.add_argument("--reproduction-commit", required=True)
+    reproduce.add_argument(
+        "--profile",
+        choices=("verification", "publication"),
+        default="publication",
+    )
 
     qualify = sub.add_parser(
         "verify-hydrodynamics",
-        help="Verify one converted record against the registered immutable archive and harmonics.",
+        help="Verify an all-six published-source reproduction directory.",
     )
-    qualify.add_argument("--input", required=True)
+    qualify.add_argument("--reproduction-directory", required=True)
+    qualify.add_argument("--published-inputs")
     qualify.add_argument("--source-registry")
     qualify.add_argument("--output", required=True)
     return parser
@@ -96,6 +109,7 @@ def main(argv: list[str] | None = None) -> int:
                     "status": "PASS",
                     "artery_id": record.artery_id,
                     "record_payload_sha256": record.record_payload_sha256,
+                    "published_source": record.metadata.get("published_source"),
                 },
                 indent=2,
             )
@@ -111,9 +125,7 @@ def main(argv: list[str] | None = None) -> int:
         source_registry = None
         registry_path = None
         if config.claim_bearing:
-            registry_path = resolve_data_path(
-                "registry/source_registry.yaml", args.source_registry
-            )
+            registry_path = resolve_data_path("registry/source_registry.yaml", args.source_registry)
             source_registry = load_yaml(registry_path)
         result = run_case(
             record,
@@ -122,12 +134,17 @@ def main(argv: list[str] | None = None) -> int:
             config,
             source_registry=source_registry,
         )
+        published = record.metadata.get("published_source", {})
         result.metadata.update(
             {
                 "record_payload_sha256": record.record_payload_sha256,
-                "source_member_sha256": record.source_member_sha256,
-                "conversion_manifest_sha256": record.conversion_manifest_sha256,
-                "converter_commit_sha": record.converter_commit_sha,
+                "source_repository_commit_sha": published.get("repository_commit_sha"),
+                "source_notebook_blob_sha": published.get("published_notebook_blob_sha"),
+                "published_input_registry_sha256": published.get(
+                    "published_input_registry_sha256"
+                ),
+                "reproduction_commit_sha": published.get("reproduction_commit_sha"),
+                "reproduction_mode": published.get("reproduction_mode"),
             }
         )
         if registry_path is not None:
@@ -136,21 +153,25 @@ def main(argv: list[str] | None = None) -> int:
         print(output)
         return 0
     if args.command == "phase0-check":
-        parameter_path = resolve_data_path(
-            "registry/parameter_registry.csv", args.parameters
-        )
+        parameter_path = resolve_data_path("registry/parameter_registry.csv", args.parameters)
         traceability_path = resolve_data_path(
             "protocol/readme_traceability.yaml", args.traceability
         )
-        source_path = resolve_data_path(
-            "registry/source_registry.yaml", args.source_registry
-        )
+        source_path = resolve_data_path("registry/source_registry.yaml", args.source_registry)
         reference_path = resolve_data_path(
             "configs/reference_arteries.yaml", args.reference_arteries
         )
+        published_path = resolve_data_path(
+            "registry/published_v2_hydrodynamics.yaml", args.published_inputs
+        )
         rows = validate_parameter_registry(parameter_path)
-        source_count = validate_source_registry(load_yaml(source_path))
+        source_registry = load_yaml(source_path)
+        source_count = validate_source_registry(source_registry)
         artery_count = validate_reference_arteries(load_yaml(reference_path))
+        published_inputs = load_yaml(published_path)
+        published_count = validate_published_inputs(published_inputs)
+        published_sha = sha256_file(published_path)
+        validate_published_source_binding(published_inputs, published_sha, source_registry)
         counts = validate_traceability_matrix(
             load_yaml(traceability_path),
             repository_root=_repository_root(args.repository_root),
@@ -162,29 +183,39 @@ def main(argv: list[str] | None = None) -> int:
                     "parameter_rows": rows,
                     "source_records": source_count,
                     "reference_arteries": artery_count,
+                    "published_source_arteries": published_count,
+                    "published_input_registry_sha256": published_sha,
                     **counts,
                 },
                 indent=2,
             )
         )
         return 0
-    if args.command == "ingest-archive":
-        report = ingest_archive_member(
-            args.archive,
-            args.member_npz,
-            args.manifest,
+    if args.command == "reproduce-hydrodynamics":
+        published_path = resolve_data_path(
+            "registry/published_v2_hydrodynamics.yaml", args.published_inputs
+        )
+        report = reproduce_all_six(
+            published_path,
             args.output,
-            args.converter_commit,
+            args.reproduction_commit,
+            args.profile,
         )
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
     if args.command == "verify-hydrodynamics":
-        record = load_artery_npz(args.input)
+        published_path = resolve_data_path(
+            "registry/published_v2_hydrodynamics.yaml", args.published_inputs
+        )
         registry_path = resolve_data_path(
             "registry/source_registry.yaml", args.source_registry
         )
-        report = qualify_hydrodynamics(record, load_yaml(registry_path))
-        save_qualification_report(report, args.output)
+        report = verify_reproduction_directory(
+            args.reproduction_directory,
+            published_path,
+            load_yaml(registry_path),
+        )
+        save_reproduction_verification(report, args.output)
         print(json.dumps(report, indent=2, sort_keys=True))
         return 0
     raise RuntimeError("unreachable")

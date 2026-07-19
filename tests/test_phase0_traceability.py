@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import yaml
 
 from lambforce_ec.protocol import (
@@ -14,7 +15,7 @@ def test_traceability_matrix_is_complete():
     matrix = yaml.safe_load((ROOT / "protocol/readme_traceability.yaml").read_text())
     counts = validate_traceability_matrix(matrix)
     assert counts["implemented"] >= 30
-    assert counts["blocked_on_archive"] == 2
+    assert counts["blocked_on_source_reproduction"] == 2
     assert {row["requirement_id"] for row in matrix["requirements"]} == {
         f"R{i:02d}" for i in range(1, 35)
     }
