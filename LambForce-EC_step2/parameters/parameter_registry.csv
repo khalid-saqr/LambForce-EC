@@ -1,0 +1,21 @@
+parameter_id,symbol,description,si_unit,frozen_value,frozen_lower,frozen_upper,frozen_set,source_id,source_strength,independent_or_derived,primary_or_secondary,claim_bearing,transformation_rule,notes
+reference_area,A_ref,Published near-wall reference area,m2,1.0e-10,,,,SRC001,ground_truth,independent,primary,true,,100 um2 baseline
+published_force_min,F_L_min,Published lower Lamb-force magnitude scale,N,1.0e-13,,,,SRC001,ground_truth,independent,feasibility,false,,0.1 pN
+published_force_max,F_L_max,Published upper Lamb-force magnitude scale,N,7.0e-12,,,,SRC001,ground_truth,independent,feasibility,false,,7 pN
+lamb_pressure_min,q_L_min,Area-normalized lower normal-load scale,Pa,,1.0e-3,1.0e-3,,SRC001,D,derived,feasibility,false,F_L_min/A_ref,
+lamb_pressure_max,q_L_max,Area-normalized upper normal-load scale,Pa,,7.0e-2,7.0e-2,,SRC001,D,derived,feasibility,false,F_L_max/A_ref,
+wss_reference,tau_w,Reference arterial WSS range,Pa,,1.0,3.0,,SRC001,ground_truth,independent,feasibility,false,,Magnitude scale used only in Step 1
+cell_length,L_x,Reference streamwise footprint,m,3.60e-5,,,,SRC003,C,independent,primary,true,,36 um
+cell_width,L_z,Reference transverse footprint,m,3.21e-5,,,,SRC003,C,independent,primary,true,,32.1 um
+cell_area,A_cell,Reference footprint area,m2,1.1556e-9,,,,SRC003,D,derived,primary,true,L_x*L_z,
+cell_height,h_cell,Reference endothelial surface height,m,5.0e-6,3.71e-6,5.11e-6,,SRC004,C,independent,primary,true,,
+cortex_thickness,h_c,Apical cortex thickness,m,1.0e-7,,,,SRC003,C,independent,primary,true,,0.10 um
+glycocalyx_thickness,h_g,Glycocalyx thickness states,m,,,,1.1e-7;5.0e-7;1.0e-6,SRC005;SRC006,A-C,independent,primary,true,,Correlated with source-specific modulus
+glycocalyx_modulus,E_g,Glycocalyx modulus states,Pa,,,,25;390;1000,SRC005;SRC003,A-C,independent,primary,true,,Do not freely recombine source-correlated states
+cortex_modulus,E_c,Apical cortex Young modulus states,Pa,,,,1000;5600,SRC003;SRC009,B-C,independent,primary,true,,
+cytosol_modulus,E_cyt,Cytosol Young modulus range,Pa,,500,1500,,SRC007;SRC003;SRC009,A-C,independent,primary,true,,
+nucleus_modulus,E_n,Nuclear Young modulus range,Pa,,5000,8000,,SRC007;SRC003,A-C,independent,secondary,true,,
+poisson_ratio,nu,Near-incompressible structural bounds,1,,,,0.45;0.49,STRUCT001,D,independent,primary,true,,
+cortex_relaxation,tau_c,Cortex relaxation-time range,s,,0.01,0.10,,SRC004,C,independent,secondary,true,,
+cytosol_relaxation,tau_cyt,Cytosol relaxation-time range,s,,1.0,5.0,,SRC004,C,independent,secondary,true,,
+nucleus_relaxation,tau_n,Nucleus relaxation-time range,s,,0.10,0.50,,SRC004,C,independent,secondary,true,,

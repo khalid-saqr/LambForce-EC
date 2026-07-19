@@ -1,0 +1,146 @@
+{
+  "harmonic_combined": {
+    "fd_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 1.2942720000000084e-13
+    },
+    "fd_reaction_resultant_n": {
+      "imag": 7.011961831026329e-30,
+      "real": 1.2942719999999978e-13
+    },
+    "spectral_applied_resultant_n": {
+      "imag": 0.0,
+      "real": -1.2529040305242492e-28
+    },
+    "spectral_reaction_resultant_n": {
+      "imag": -1.410601437107888e-35,
+      "real": -1.2529040305242492e-28
+    }
+  },
+  "harmonic_normal": {
+    "fd_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 1.2942720000000084e-13
+    },
+    "fd_reaction_resultant_n": {
+      "imag": 7.011961831026329e-30,
+      "real": 1.2942719999999978e-13
+    },
+    "spectral_applied_resultant_n": {
+      "imag": 0.0,
+      "real": -1.2529040305242492e-28
+    },
+    "spectral_reaction_resultant_n": {
+      "imag": -1.410601437107888e-35,
+      "real": -1.2529040305242492e-28
+    }
+  },
+  "harmonic_tangential": {
+    "fd_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    },
+    "fd_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    },
+    "spectral_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    },
+    "spectral_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    }
+  },
+  "spatial_normal_static": {
+    "fd_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 3.730739040000001e-11
+    },
+    "fd_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 3.730739040000002e-11
+    },
+    "spectral_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 4.044600000000001e-11
+    },
+    "spectral_reaction_resultant_n": {
+      "imag": 1.2364470242966056e-44,
+      "real": 4.044600000000001e-11
+    }
+  },
+  "tangential_static": {
+    "fd_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    },
+    "fd_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    },
+    "spectral_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    },
+    "spectral_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    }
+  },
+  "uniform_normal_high": {
+    "fd_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 7.455006720000002e-11
+    },
+    "fd_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 7.455006720000002e-11
+    },
+    "spectral_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 8.089200000000002e-11
+    },
+    "spectral_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 8.089200000000002e-11
+    }
+  },
+  "uniform_normal_low": {
+    "fd_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 1.0650009600000002e-12
+    },
+    "fd_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 1.0650009600000002e-12
+    },
+    "spectral_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 1.1556000000000002e-12
+    },
+    "spectral_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 1.1556000000000002e-12
+    }
+  },
+  "zero_static": {
+    "fd_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    },
+    "fd_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    },
+    "spectral_applied_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    },
+    "spectral_reaction_resultant_n": {
+      "imag": 0.0,
+      "real": 0.0
+    }
+  }
+}

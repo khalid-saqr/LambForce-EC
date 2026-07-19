@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/khalid-saqr/LambForce-EC/schemas/artery_input.schema.json",
+  "title": "LambForce-EC artery metadata",
+  "type": "object",
+  "required": [
+    "artery_id", "artery_name", "radius_m", "omega0_rad_s", "source_identifier",
+    "source_version", "source_checksum", "coordinate_convention"
+  ],
+  "properties": {
+    "artery_id": {"type": "string", "minLength": 1},
+    "artery_name": {"type": "string", "minLength": 1},
+    "radius_m": {"type": "number", "exclusiveMinimum": 0},
+    "omega0_rad_s": {"type": "number", "exclusiveMinimum": 0},
+    "source_identifier": {"type": "string", "minLength": 1},
+    "source_version": {"type": "string", "minLength": 1},
+    "source_checksum": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "coordinate_convention": {"const": "outward_normal_positive"},
+    "metadata": {"type": "object"}
+  },
+  "additionalProperties": true
+}

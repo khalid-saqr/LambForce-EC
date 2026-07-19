@@ -1,0 +1,12 @@
+source_id,citation,doi,pmid,pmcid,url,evidence_role
+SRC001,"Saqr KM. A transverse picoNewton force revealed in anisotropic Womersley flow. Scientific Reports 16, 12584 (2026).",10.1038/s41598-026-47474-x,,,https://doi.org/10.1038/s41598-026-47474-x,"Hydrodynamic ground truth, six arteries, force and WSS scales"
+SRC002,"Willemet M, Chowienczyk P, Alastruey J. Virtual healthy-subject arterial waveform database.",10.1152/ajpheart.00175.2015,,,https://doi.org/10.1152/ajpheart.00175.2015,Arterial waveform source
+SRC003,"Dabagh M et al. Shear-induced force transmission in a multicomponent, multicell model of the endothelium.",10.1098/rsif.2014.0431,,PMC4233691,https://pmc.ncbi.nlm.nih.gov/articles/PMC4233691/,Reference endothelial geometry and material model
+SRC004,Dabagh M et al. Mechanotransmission in endothelial cells subjected to oscillatory and multidirectional shear flow.,10.1098/rsif.2017.0185,,PMC5454307,https://pmc.ncbi.nlm.nih.gov/articles/PMC5454307/,Dynamic endothelial geometry and relaxation architecture
+SRC005,Direct endothelial glycocalyx thickness and modulus measurement.,,32135082,,https://pubmed.ncbi.nlm.nih.gov/32135082/,Direct glycocalyx thickness/modulus state
+SRC006,"Bai K, Wang W. Spatio-temporal development of the endothelial glycocalyx layer and its mechanical properties.",10.1098/rsif.2011.0901,,,https://doi.org/10.1098/rsif.2011.0901,Glycocalyx development and mechanics
+SRC007,Caille N et al. Contribution of the nucleus to the mechanical properties of endothelial cells.,10.1016/S0021-9290(01)00201-9,11784536,,https://pubmed.ncbi.nlm.nih.gov/11784536/,Cytoplasm and nucleus moduli
+SRC008,Han et al. Arterial endothelial morphology under longitudinal stretch.,,18922530,PMC2823635,https://pmc.ncbi.nlm.nih.gov/articles/PMC2823635/,Arterial endothelial aspect-ratio states
+SRC009,Costa KD et al. Human aortic endothelial AFM stiffness measurements.,,16524328,,https://pubmed.ncbi.nlm.nih.gov/16524328/,Cortical and cytoplasmic stiffness bounds
+SRC010,Glycocalyx–spectrin transmission into endothelial membrane tension.,10.1038/s41556-022-00953-5,,,https://doi.org/10.1038/s41556-022-00953-5,Biological plausibility of apical mechanotransmission
+STRUCT001,Near-incompressible structural bounds used as explicit model alternatives.,,,,,"Poisson-ratio structural bound, not a measured universal constant"

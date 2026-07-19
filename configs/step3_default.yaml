@@ -1,0 +1,38 @@
+geometry:
+  length_x_m: 3.60e-5
+  length_z_m: 3.21e-5
+  cell_height_m: 5.0e-6
+  cortex_thickness_m: 1.0e-7
+  glycocalyx_thickness_m: 5.0e-7
+material:
+  parameter_set_id: reference_reduced_model_v1
+  poisson_ratio: 0.45
+  cortex:
+    einf_pa: 1000.0
+    ratio_e0_einf: 2.0
+    relaxation_time_s: 0.05
+  cytosol:
+    einf_pa: 500.0
+    ratio_e0_einf: 2.0
+    relaxation_time_s: 2.0
+  glycocalyx:
+    einf_pa: 390.0
+    ratio_e0_einf: 2.0
+    relaxation_time_s: 0.10
+  nucleus:
+    einf_pa: 5000.0
+    ratio_e0_einf: 2.0
+    relaxation_time_s: 0.25
+run:
+  nx: 32
+  nz: 32
+  solver_id: periodic_spectral_2d
+  structural_model_id: reduced_plate_foundation_series_glycocalyx_v1
+  load_distribution: uniform_apical
+  load_case: wss_plus_lamb_signed
+  harmonic_control: full_waveform
+  localized_sigma_x_fraction: 0.15
+  localized_sigma_z_fraction: 0.15
+  conservation_tolerance_relative: 1.0e-12
+  protocol_version: 1.0.0-step1
+  parameter_freeze_version: 2.0.0

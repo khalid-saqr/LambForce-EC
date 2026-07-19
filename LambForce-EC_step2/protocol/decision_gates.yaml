@@ -1,0 +1,53 @@
+protocol_version: "1.0.0-step1"
+gates:
+  dimensional_closure:
+    required: true
+    rule: "All transformations close in SI units without empirical conversion gain."
+  resultant_conservation:
+    required: true
+    tolerance_relative: 1.0e-12
+    rule: "Integrated applied and reaction resultants agree."
+  numerical_significance:
+    required: true
+    rule: "Incremental response exceeds the combined discretization and solver error floor."
+  wss_present:
+    required: true
+    rule: "The effect exists in WSS+Lamb relative to WSS-only."
+  anisotropy_attribution:
+    required: true
+    rule: "The effect persists for the anisotropy increment and is not explained by the isotropic control."
+  experimental_scale_consistency:
+    required: true
+    rule: "At least one mechanical output is consistent with a documented endothelial measurement or model scale."
+  parameter_robustness:
+    required: true
+    rule: "The conclusion survives all claim-bearing registered parameter sets."
+  structural_robustness:
+    required: true
+    rule: "The conclusion does not depend only on localized loading, clamped support or one nuclear representation."
+  cross_artery_generality:
+    required: true
+    minimum_reference_arteries: 4
+    total_reference_arteries: 6
+  spectral_relevance:
+    required: true
+    comparators:
+      - fundamental_only
+      - harmonics_le_2
+      - full_waveform
+  no_post_hoc_tuning:
+    required: true
+    rule: "Protocol and parameter versions predate claim-bearing runs."
+allowed_classifications:
+  - robustly_biologically_meaningful
+  - mechanically_present_but_parameter_conditional
+  - mechanically_present_but_below_experimental_scale
+  - not_resolved_above_numerical_error
+  - negative_under_registered_model_domain
+step1_exit:
+  - dimensional_closure
+  - resultant_conservation
+  - positive_elastic_energy
+  - stable_nonzero_normal_response
+  - stable_nonzero_tangential_response
+  - acceptable_prototype_runtime

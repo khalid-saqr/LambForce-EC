@@ -1,0 +1,352 @@
+{
+  "checks": {
+    "acceptable_prototype_runtime": true,
+    "dimensional_closure": true,
+    "positive_elastic_energy": true,
+    "resultant_conservation": true,
+    "stable_nonzero_normal_response": true,
+    "stable_nonzero_tangential_response": true
+  },
+  "geometry": {
+    "area_m2": 1.1556e-09,
+    "cell_height_m": 5e-06,
+    "cortex_thickness_m": 1e-07,
+    "equivalent_radius_m": 1.917912679122771e-05
+  },
+  "input_ranges": {
+    "q_l_pa": {
+      "max": 0.07,
+      "min": 0.001
+    },
+    "wss_pa": {
+      "max": 3.0,
+      "min": 1.0
+    }
+  },
+  "model_role": "step1_feasibility_only",
+  "normal_cases": [
+    {
+      "applied_force_n": 1.1556e-12,
+      "bending_rigidity_n_m": 1.0449320794148378e-19,
+      "bending_stiffness_n_m3": 49.425687077370426,
+      "center_displacement_m": 9.999995057433738e-12,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 1000.0,
+      "cytosol_modulus_pa": 500.0,
+      "elastic_work_j": 5.777997144185214e-24,
+      "foundation_stiffness_n_m3": 99999999.99999999,
+      "poisson_ratio": 0.45,
+      "q_l_pa": 0.001,
+      "reaction_force_n": 1.1556e-12
+    },
+    {
+      "applied_force_n": 1.1556e-12,
+      "bending_rigidity_n_m": 1.0966355222178355e-19,
+      "bending_stiffness_n_m3": 51.871279700227554,
+      "center_displacement_m": 9.999994812874722e-12,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 1000.0,
+      "cytosol_modulus_pa": 500.0,
+      "elastic_work_j": 5.777997002879014e-24,
+      "foundation_stiffness_n_m3": 99999999.99999999,
+      "poisson_ratio": 0.49,
+      "q_l_pa": 0.001,
+      "reaction_force_n": 1.1556e-12
+    },
+    {
+      "applied_force_n": 1.1556e-12,
+      "bending_rigidity_n_m": 1.0449320794148378e-19,
+      "bending_stiffness_n_m3": 49.425687077370426,
+      "center_displacement_m": 3.3333327841591232e-12,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 1000.0,
+      "cytosol_modulus_pa": 1500.0,
+      "elastic_work_j": 1.9259996826871413e-24,
+      "foundation_stiffness_n_m3": 300000000.0,
+      "poisson_ratio": 0.45,
+      "q_l_pa": 0.001,
+      "reaction_force_n": 1.1556e-12
+    },
+    {
+      "applied_force_n": 1.1556e-12,
+      "bending_rigidity_n_m": 1.0966355222178355e-19,
+      "bending_stiffness_n_m3": 51.871279700227554,
+      "center_displacement_m": 3.3333327569858806e-12,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 1000.0,
+      "cytosol_modulus_pa": 1500.0,
+      "elastic_work_j": 1.925999666986442e-24,
+      "foundation_stiffness_n_m3": 300000000.0,
+      "poisson_ratio": 0.49,
+      "q_l_pa": 0.001,
+      "reaction_force_n": 1.1556e-12
+    },
+    {
+      "applied_force_n": 1.1556e-12,
+      "bending_rigidity_n_m": 5.851619644723092e-19,
+      "bending_stiffness_n_m3": 276.7838476332744,
+      "center_displacement_m": 9.999972321691848e-12,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 5600.0,
+      "cytosol_modulus_pa": 500.0,
+      "elastic_work_j": 5.77798400747355e-24,
+      "foundation_stiffness_n_m3": 99999999.99999999,
+      "poisson_ratio": 0.45,
+      "q_l_pa": 0.001,
+      "reaction_force_n": 1.1556e-12
+    },
+    {
+      "applied_force_n": 1.1556e-12,
+      "bending_rigidity_n_m": 6.141158924419879e-19,
+      "bending_stiffness_n_m3": 290.4791663212743,
+      "center_displacement_m": 9.999970952167748e-12,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 5600.0,
+      "cytosol_modulus_pa": 500.0,
+      "elastic_work_j": 5.777983216162525e-24,
+      "foundation_stiffness_n_m3": 99999999.99999999,
+      "poisson_ratio": 0.49,
+      "q_l_pa": 0.001,
+      "reaction_force_n": 1.1556e-12
+    },
+    {
+      "applied_force_n": 1.1556e-12,
+      "bending_rigidity_n_m": 5.851619644723092e-19,
+      "bending_stiffness_n_m3": 276.7838476332744,
+      "center_displacement_m": 3.333330257960086e-12,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 5600.0,
+      "cytosol_modulus_pa": 1500.0,
+      "elastic_work_j": 1.9259982230493378e-24,
+      "foundation_stiffness_n_m3": 300000000.0,
+      "poisson_ratio": 0.45,
+      "q_l_pa": 0.001,
+      "reaction_force_n": 1.1556e-12
+    },
+    {
+      "applied_force_n": 1.1556e-12,
+      "bending_rigidity_n_m": 6.141158924419879e-19,
+      "bending_stiffness_n_m3": 290.4791663212743,
+      "center_displacement_m": 3.333330105790166e-12,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 5600.0,
+      "cytosol_modulus_pa": 1500.0,
+      "elastic_work_j": 1.925998135125558e-24,
+      "foundation_stiffness_n_m3": 300000000.0,
+      "poisson_ratio": 0.49,
+      "q_l_pa": 0.001,
+      "reaction_force_n": 1.1556e-12
+    },
+    {
+      "applied_force_n": 8.089200000000001e-11,
+      "bending_rigidity_n_m": 1.0449320794148378e-19,
+      "bending_stiffness_n_m3": 49.425687077370426,
+      "center_displacement_m": 6.999996540203616e-10,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 1000.0,
+      "cytosol_modulus_pa": 500.0,
+      "elastic_work_j": 2.831218600650755e-20,
+      "foundation_stiffness_n_m3": 99999999.99999999,
+      "poisson_ratio": 0.45,
+      "q_l_pa": 0.07,
+      "reaction_force_n": 8.089200000000001e-11
+    },
+    {
+      "applied_force_n": 8.089200000000001e-11,
+      "bending_rigidity_n_m": 1.0966355222178355e-19,
+      "bending_stiffness_n_m3": 51.871279700227554,
+      "center_displacement_m": 6.999996369012306e-10,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 1000.0,
+      "cytosol_modulus_pa": 500.0,
+      "elastic_work_j": 2.8312185314107174e-20,
+      "foundation_stiffness_n_m3": 99999999.99999999,
+      "poisson_ratio": 0.49,
+      "q_l_pa": 0.07,
+      "reaction_force_n": 8.089200000000001e-11
+    },
+    {
+      "applied_force_n": 8.089200000000001e-11,
+      "bending_rigidity_n_m": 1.0449320794148378e-19,
+      "bending_stiffness_n_m3": 49.425687077370426,
+      "center_displacement_m": 2.3333329489113864e-10,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 1000.0,
+      "cytosol_modulus_pa": 1500.0,
+      "elastic_work_j": 9.437398445166995e-21,
+      "foundation_stiffness_n_m3": 300000000.0,
+      "poisson_ratio": 0.45,
+      "q_l_pa": 0.07,
+      "reaction_force_n": 8.089200000000001e-11
+    },
+    {
+      "applied_force_n": 8.089200000000001e-11,
+      "bending_rigidity_n_m": 1.0966355222178355e-19,
+      "bending_stiffness_n_m3": 51.871279700227554,
+      "center_displacement_m": 2.3333329298901165e-10,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 1000.0,
+      "cytosol_modulus_pa": 1500.0,
+      "elastic_work_j": 9.437398368233566e-21,
+      "foundation_stiffness_n_m3": 300000000.0,
+      "poisson_ratio": 0.49,
+      "q_l_pa": 0.07,
+      "reaction_force_n": 8.089200000000001e-11
+    },
+    {
+      "applied_force_n": 8.089200000000001e-11,
+      "bending_rigidity_n_m": 5.851619644723092e-19,
+      "bending_stiffness_n_m3": 276.7838476332744,
+      "center_displacement_m": 6.999980625184294e-10,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 5600.0,
+      "cytosol_modulus_pa": 500.0,
+      "elastic_work_j": 2.83121216366204e-20,
+      "foundation_stiffness_n_m3": 99999999.99999999,
+      "poisson_ratio": 0.45,
+      "q_l_pa": 0.07,
+      "reaction_force_n": 8.089200000000001e-11
+    },
+    {
+      "applied_force_n": 8.089200000000001e-11,
+      "bending_rigidity_n_m": 6.141158924419879e-19,
+      "bending_stiffness_n_m3": 290.4791663212743,
+      "center_displacement_m": 6.999979666517425e-10,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 5600.0,
+      "cytosol_modulus_pa": 500.0,
+      "elastic_work_j": 2.831211775919638e-20,
+      "foundation_stiffness_n_m3": 99999999.99999999,
+      "poisson_ratio": 0.49,
+      "q_l_pa": 0.07,
+      "reaction_force_n": 8.089200000000001e-11
+    },
+    {
+      "applied_force_n": 8.089200000000001e-11,
+      "bending_rigidity_n_m": 5.851619644723092e-19,
+      "bending_stiffness_n_m3": 276.7838476332744,
+      "center_displacement_m": 2.33333118057206e-10,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 5600.0,
+      "cytosol_modulus_pa": 1500.0,
+      "elastic_work_j": 9.437391292941756e-21,
+      "foundation_stiffness_n_m3": 300000000.0,
+      "poisson_ratio": 0.45,
+      "q_l_pa": 0.07,
+      "reaction_force_n": 8.089200000000001e-11
+    },
+    {
+      "applied_force_n": 8.089200000000001e-11,
+      "bending_rigidity_n_m": 6.141158924419879e-19,
+      "bending_stiffness_n_m3": 290.4791663212743,
+      "center_displacement_m": 2.3333310740531165e-10,
+      "conservation_relative_error": 0.0,
+      "cortex_modulus_pa": 5600.0,
+      "cytosol_modulus_pa": 1500.0,
+      "elastic_work_j": 9.437390862115236e-21,
+      "foundation_stiffness_n_m3": 300000000.0,
+      "poisson_ratio": 0.49,
+      "q_l_pa": 0.07,
+      "reaction_force_n": 8.089200000000001e-11
+    }
+  ],
+  "normal_response": {
+    "applied_force_n": {
+      "max": 8.089200000000001e-11,
+      "min": 1.1556e-12
+    },
+    "case_count": 16,
+    "center_displacement_m": {
+      "max": 6.999996540203616e-10,
+      "min": 3.333330105790166e-12
+    },
+    "elastic_work_j": {
+      "max": 2.831218600650755e-20,
+      "min": 1.925998135125558e-24
+    },
+    "foundation_to_bending_stiffness_ratio": {
+      "max": 6069718.353745559,
+      "min": 344258.76824983204
+    },
+    "max_conservation_relative_error": 0.0
+  },
+  "runtime_s": 0.0001735360001475783,
+  "status": "PASS",
+  "tangential_cases": [
+    {
+      "cytosol_modulus_pa": 500.0,
+      "poisson_ratio": 0.45,
+      "shear_modulus_pa": 172.41379310344828,
+      "shear_strain": 0.0058,
+      "tangential_displacement_m": 2.9e-08,
+      "wss_pa": 1.0
+    },
+    {
+      "cytosol_modulus_pa": 500.0,
+      "poisson_ratio": 0.49,
+      "shear_modulus_pa": 167.78523489932886,
+      "shear_strain": 0.00596,
+      "tangential_displacement_m": 2.9800000000000002e-08,
+      "wss_pa": 1.0
+    },
+    {
+      "cytosol_modulus_pa": 1500.0,
+      "poisson_ratio": 0.45,
+      "shear_modulus_pa": 517.2413793103449,
+      "shear_strain": 0.0019333333333333331,
+      "tangential_displacement_m": 9.666666666666667e-09,
+      "wss_pa": 1.0
+    },
+    {
+      "cytosol_modulus_pa": 1500.0,
+      "poisson_ratio": 0.49,
+      "shear_modulus_pa": 503.3557046979866,
+      "shear_strain": 0.0019866666666666665,
+      "tangential_displacement_m": 9.933333333333333e-09,
+      "wss_pa": 1.0
+    },
+    {
+      "cytosol_modulus_pa": 500.0,
+      "poisson_ratio": 0.45,
+      "shear_modulus_pa": 172.41379310344828,
+      "shear_strain": 0.0174,
+      "tangential_displacement_m": 8.7e-08,
+      "wss_pa": 3.0
+    },
+    {
+      "cytosol_modulus_pa": 500.0,
+      "poisson_ratio": 0.49,
+      "shear_modulus_pa": 167.78523489932886,
+      "shear_strain": 0.01788,
+      "tangential_displacement_m": 8.94e-08,
+      "wss_pa": 3.0
+    },
+    {
+      "cytosol_modulus_pa": 1500.0,
+      "poisson_ratio": 0.45,
+      "shear_modulus_pa": 517.2413793103449,
+      "shear_strain": 0.0058,
+      "tangential_displacement_m": 2.9e-08,
+      "wss_pa": 3.0
+    },
+    {
+      "cytosol_modulus_pa": 1500.0,
+      "poisson_ratio": 0.49,
+      "shear_modulus_pa": 503.3557046979866,
+      "shear_strain": 0.00596,
+      "tangential_displacement_m": 2.9800000000000002e-08,
+      "wss_pa": 3.0
+    }
+  ],
+  "tangential_response": {
+    "case_count": 8,
+    "shear_strain": {
+      "max": 0.01788,
+      "min": 0.0019333333333333331
+    },
+    "tangential_displacement_m": {
+      "max": 8.94e-08,
+      "min": 9.666666666666667e-09
+    }
+  }
+}

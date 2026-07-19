@@ -1,0 +1,52 @@
+protocol_version: "1.0.0-step1"
+project: "LambForce-EC"
+primary_thesis: >-
+  A multiscale physical interface reveals whether the integrated anisotropic
+  near-wall inertial force field produces biologically meaningful endothelial
+  membrane loading independently of wall shear stress across six arterial waveforms.
+ground_truth:
+  source_doi: "10.1038/s41598-026-47474-x"
+  immutable:
+    - anisotropic_womersley_equations
+    - velocity_and_vorticity_reconstruction
+    - signed_lamb_force_density
+    - pillbox_integration
+    - exposure_integral
+    - wall_shear_stress
+    - isotropic_control
+    - six_artery_waveforms
+    - harmonic_analysis
+hypotheses:
+  H1:
+    name: incremental_loading
+    null: "WSS+Lamb minus WSS-only membrane loading is not resolved above numerical error."
+    alternative: "A resolved nonzero incremental membrane field exists."
+    primary_outputs:
+      - membrane_tension_increment_lamb
+      - displacement_normal
+      - strain_energy_density
+  H2:
+    name: anisotropy_attribution
+    null: "The resolved response is explained by the isotropic Lamb component."
+    alternative: "The anisotropy-specific increment produces a resolved response."
+    primary_outputs:
+      - membrane_tension_increment_lamb
+      - harmonic_gain
+  H3:
+    name: parameter_and_structure_robustness
+    null: "The result depends on a narrow parameter choice or one structural model."
+    alternative: "The result persists across the registered parameter and structural domain."
+  H4:
+    name: cross_artery_generality
+    null: "The effect is isolated to fewer than four reference arteries."
+    alternative: "The predeclared effect passes in at least four of six reference arteries."
+  H5:
+    name: spectral_relevance
+    null: "The full waveform is indistinguishable from low-harmonic controls."
+    alternative: "Higher harmonics alter at least one registered membrane-loading metric."
+out_of_scope:
+  - piezo1_gating
+  - calcium_signalling
+  - gene_expression
+  - disease_prediction
+  - reconstruction_of_lamb_field_from_wss

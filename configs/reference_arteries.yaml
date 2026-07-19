@@ -1,0 +1,37 @@
+source:
+  doi: 10.1038/s41598-026-47474-x
+  role: immutable_hydrodynamic_reference_metadata
+  note: >-
+    This registry does not replace the signed archived fields. Claim-bearing runs must attach
+    verified field arrays and source checksums through the artery input schema.
+arteries:
+  - artery_id: aortic_root
+    artery_name: Aortic Root
+    radius_m: 0.0150
+    womersley_alpha: 22.03
+    pressure_harmonic_amplitudes: [1.00, 0.82, 0.54, 0.33, 0.24, 0.17]
+  - artery_id: thoracic_aorta
+    artery_name: Thoracic Aorta
+    radius_m: 0.0120
+    womersley_alpha: 17.62
+    pressure_harmonic_amplitudes: [1.00, 0.76, 0.45, 0.28, 0.20, 0.12]
+  - artery_id: femoral
+    artery_name: Femoral
+    radius_m: 0.0040
+    womersley_alpha: 5.87
+    pressure_harmonic_amplitudes: [1.00, 0.58, 0.10, -0.17, 0.05, 0.04]
+  - artery_id: carotid
+    artery_name: Carotid
+    radius_m: 0.0035
+    womersley_alpha: 5.14
+    pressure_harmonic_amplitudes: [1.00, 0.63, 0.31, 0.15, 0.10, 0.06]
+  - artery_id: iliac
+    artery_name: Iliac
+    radius_m: 0.0045
+    womersley_alpha: 6.61
+    pressure_harmonic_amplitudes: [1.00, 0.51, 0.12, -0.11, 0.05, 0.03]
+  - artery_id: brachial
+    artery_name: Brachial
+    radius_m: 0.0020
+    womersley_alpha: 2.94
+    pressure_harmonic_amplitudes: [1.00, 0.49, 0.16, -0.05, 0.02, 0.01]
